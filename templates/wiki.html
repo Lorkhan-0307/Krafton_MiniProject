@@ -1,13 +1,38 @@
 <!-- templates/wiki.html -->
 <!doctype html>
 <html lang="en">
+    <script>
+       document.addEventListener('DOMContentLoaded', async function() {
+            const token = sessionStorage.getItem('access_token');
+            if (!token) {
+                alert('ERROR')
+                window.location.href = '/login';
+            } 
+            
+            const response = await fetch('{{ url_for("wiki") }}', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('welcome-message').innerText = `Welcome, ${data.logged_in_as}`;
+            } else {
+                localStorage.removeItem('access_token');
+                window.location.href = '{{ url_for("login") }}';
+            }
+        });
+    </script>
+    </script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wiki Page</title>
 </head>
 <body>
-    <h1>Welcome to the Wiki, {{ username }}</h1>
+    <h1 id="welcome-message">Welcome to the Wiki, {{ username }}</h1>
     <p>This is a protected wiki page.</p>
 </body>
 </html>
