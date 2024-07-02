@@ -12,11 +12,7 @@ app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
 mongo = PyMongo(app)
 jwt = JWTManager(app)
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/login', methods=['GET'])
+@app.route('/', methods=['GET'])
 def login_page():
     return render_template('login.html')
 
@@ -34,7 +30,7 @@ def signup():
     user_collection.insert_one({'username': data['username'], 'password': hashed_password})
     return redirect(url_for('login_page'))
 
-@app.route('/login', methods=['POST'])
+@app.route('/', methods=['POST'])
 def login():
     data = request.form
     user_collection = mongo.db.users
