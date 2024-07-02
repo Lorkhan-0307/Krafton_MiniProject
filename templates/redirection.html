@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Redirecting...</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = sessionStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = '/';
+            } else {
+                fetch('/redirection', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                }).then(response => {
+                    if (response.status === 401) {
+                        window.location.href = '/';
+                    }
+                    else{
+                        window.location.href = '/wiki';
+                    }
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <p>Redirecting to wiki...</p>
+</body>
+</html>
