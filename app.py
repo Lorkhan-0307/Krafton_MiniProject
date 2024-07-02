@@ -39,7 +39,7 @@ def redirection_page():
 
 @app.route('/wiki', methods=['GET'])
 def wiki_page():
-    return render_template('wiki.html')
+    return render_template('wiki.html') 
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -51,6 +51,20 @@ def signup():
     user_collection.insert_one({'username': data['username'], 'password': hashed_password})
     return redirect(url_for('login_page'))
 
+@app.route('/write_page', methods=['GET'])
+def write_page():
+    return render_template('write.html')
+
+@app.route('/write', methods=['POST'])
+@jwt_required()
+def write():
+    try:
+        verify_jwt_in_request()
+        print('okay!')
+        return jsonify({"redirect_url": url_for('write_page')})
+
+    except:
+        return jsonify({"redirect_url": url_for('login_page')})
 
 
 

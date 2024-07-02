@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write to Wiki</title>
+    <!-- SimpleMDE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            width: 80%;
+            max-width: 800px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        #markdown-editor {
+            width: 100%;
+            height: 500px;
+        }
+        .editor-container {
+            width: 80%;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Write to Wiki</h1>
+    <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" id="title" name="title" placeholder="제목을 입력하세요.">
+    </div>
+    <div class="form-group">
+        <label for="tag">태그</label>
+        <input type="text" id="tag" name="tag" placeholder="태그를 입력하세요.">
+    </div>
+    <div class="form-group">
+        <label for="writer">글쓴이</label>
+        <p type="text" id="writer" name="writer"></p>
+    </div>
+    <div class="editor-container">
+        <label for="markdown-editor">Content</label>
+        <textarea id="markdown-editor"></textarea>
+    </div>
+
+    <button type="submit"
+            class="py-3 px-5 bg-gray-800 text-white mt-7 text-base rounded-lg focus:outline-none hover:opacity-90">
+            저장
+    </button>
+
+    <!-- SimpleMDE JS -->
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const token = sessionStorage.getItem('access_token');
+            if (!token) {
+                alert('ERROR')
+                window.location.href = '/login';
+            } 
+            
+            const response = await fetch('{{ url_for("wiki") }}', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('writer').innerText = `${data.logged_in_as}`;
+            } else {
+                localStorage.removeItem('access_token');
+                window.location.href = '{{ url_for("login") }}';
+            }
+        });
+
+        // Initialize SimpleMDE
+        var simplemde = new SimpleMDE({
+            element: document.getElementById("markdown-editor"),
+            spellChecker: false,  // Disable spell checker
+            autosave: {
+                enabled: true,
+                uniqueId: "markdown-editor",
+                delay: 1000,
+            },
+            status: ["autosave", "lines", "words", "cursor"],  // Status bar items
+        });
+
+        // Adjust the size of the editor dynamically
+        simplemde.codemirror.getWrapperElement().style.height = '500px';
+    </script>
+</body>
+</html>

@@ -24,7 +24,39 @@
                 window.location.href = '{{ url_for("login") }}';
             }
         });
-    </script>
+
+        async function submitForm(event) {
+            event.preventDefault();
+
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert('Access token is missing!');
+                return;
+            }
+
+            const response = await fetch('/write', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                }
+            });
+
+
+            if (response.ok) {
+                const result = await response.json();
+                // 서버가 리디렉션 URL을 응답으로 보낼 경우
+                if (result.redirect_url) {
+                    window.location.href = result.redirect_url;  
+                }
+            } else {
+                console.error('Error:', response.statusText);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('form').addEventListener('submit', submitForm);
+        });
+    
     </script>
 <head>
     <meta charset="UTF-8">
@@ -34,5 +66,12 @@
 <body>
     <h1 id="welcome-message">Welcome to the Wiki, {{ username }}</h1>
     <p>This is a protected wiki page.</p>
+
+    <form class="flex flex-col mt-5 px-5">
+        <button type="submit"
+            class="py-3 px-5 bg-gray-800 text-white mt-7 text-base rounded-lg focus:outline-none hover:opacity-90">
+            글 쓰기
+        </button>
+    </form>
 </body>
 </html>
