@@ -1,95 +1,62 @@
-<!-- templates/login.html -->
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h1>Login</h1>
-    <form id="login-form">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <button type="submit">Login</button>
-    </form>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        document.getElementById('login-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('login-form').addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
 
-            const response = await fetch('/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body: new URLSearchParams({
-                    username,
-                    password
-                })
+                const response = await fetch('/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        username,
+                        password
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    sessionStorage.setItem('access_token', data.access_token);
+                    window.location.href = '/redirection';
+                } else {
+                    alert('Invalid credentials');
+                }
             });
-
-            if (response.ok) {
-                const data = await response.json();
-                sessionStorage.setItem('access_token', data.access_token);
-
-                alert(data.access_token)
-
-                window.location.href = '/redirection';
-            } else {
-                alert('Invalid credentials');
-            }
         });
     </script>
-</body>
-</html>
-<!--
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>TerraWiki Login</title>
 </head>
 <body>
-    <h1>Login</h1>
-    <form id="login-form">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
-        <br>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
-        <br>
-        <button type="submit">Login</button>
-    </form>
-    <div id="error-message"></div>
-    <script>
-        document.getElementById('login-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+    <div class="h-screen flex items-center justify-center bg-gray-800">
+        <div class="bg-white w-full max-w-lg py-4 rounded-lg text-center">
+            <h3 class="text-3xl text-gray-800">TerraWiki Login</h3>
+            <form class="flex flex-col mt-5 px-5" action="/" method="post" id="login-form">
+                <input type="text" placeholder="Username" name="userName" id="username"
+                    class="bg-gray-100 shadow-inner focus:outline-none border-2 focus:border-opacity-50 focus:border-green-600 mb-3 py-3 px-5 rounded-lg" />
+                <input type="password" placeholder="Password" name="userPassword" id="password"
+                    class="bg-gray-100 shadow-inner focus:outline-none border-2 focus:border-opacity-50 focus:border-green-600 py-3 px-5 rounded-lg" />
 
-            const response = await fetch('{{ url_for("login") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ username, password }),
-            });
-
-            const result = await response.json();
-
-            if (response.ok) {
-                localStorage.setItem('access_token', result.access_token);
-                window.location.href = 'protected'
-            } else {
-                document.getElementById('error-message').innerText = result.msg;
-            }
-        });
-    </script>
+                <div class="justify-between mt-3">
+                    <button
+                        class="w-40 py-3 px-5 bg-gray-800 text-white mt-3 ms-5 text-base rounded-lg focus:outline-none hover:opacity-90"
+                        onClick="location.href='signup'; return false;">
+                        Sign Up
+                    </button>
+                    <button type="submit"
+                        class="w-40 py-3 px-5 bg-gray-800 text-white mt-3 text-base rounded-lg focus:outline-none hover:opacity-90">
+                        Log In
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 </html>
--->

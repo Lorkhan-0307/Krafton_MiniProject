@@ -14,13 +14,20 @@ app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 mongo = PyMongo(app)
 jwt = JWTManager(app)
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-@app.route('/login', methods=['GET'])
+@app.route('/', methods=['GET'])
 def login_page():
     return render_template('login.html')
+
+@app.route('/', methods=['POST'])
+def login():
+    data = request.form
+    user_collection = mongo.db.users
+    user = user_collection.find_one({'username': data['username']})
+    if not user or not check_password_hash(user['password'], data['password']):
+        return jsonify({'message': 'Invalid credentials'}), 401
+
+    access_token = create_access_token(identity={'username': user['username']})
+    return jsonify(access_token=access_token), 200
 
 @app.route('/signup', methods=['GET'])
 def signup_page():
@@ -44,16 +51,7 @@ def signup():
     user_collection.insert_one({'username': data['username'], 'password': hashed_password})
     return redirect(url_for('login_page'))
 
-@app.route('/login', methods=['POST'])
-def login():
-    data = request.form
-    user_collection = mongo.db.users
-    user = user_collection.find_one({'username': data['username']})
-    if not user or not check_password_hash(user['password'], data['password']):
-        return jsonify({'message': 'Invalid credentials'}), 401
 
-    access_token = create_access_token(identity={'username': user['username']})
-    return jsonify(access_token=access_token), 200
 
 
 @app.route('/wiki', methods=['POST'])
