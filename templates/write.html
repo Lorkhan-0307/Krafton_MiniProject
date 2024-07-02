@@ -6,6 +6,7 @@
     <title>Write to Wiki</title>
     <!-- SimpleMDE CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -67,7 +68,8 @@
         <textarea id="markdown-editor"></textarea>
     </div>
 
-    <button type="submit"
+    
+    <button type="submit" id="submit-btn"
             class="py-3 px-5 bg-gray-800 text-white mt-7 text-base rounded-lg focus:outline-none hover:opacity-90">
             저장
     </button>
@@ -82,8 +84,8 @@
                 window.location.href = '/login';
             } 
             
-            const response = await fetch('{{ url_for("wiki") }}', {
-                method: 'POST',
+            const response = await fetch('/verification', {
+                method: 'GET',
                 headers: {
                     'Authorization': 'Bearer ' + token,
                 }
@@ -112,6 +114,43 @@
 
         // Adjust the size of the editor dynamically
         simplemde.codemirror.getWrapperElement().style.height = '500px';
+
+
+         // Submit button click event
+         document.getElementById('submit-btn').addEventListener('click', function() {
+            const title = document.getElementById('title').value;
+            const tag = document.getElementById('tag').value;
+            const writer = document.getElementById('writer').innerText;
+            const content = simplemde.value();
+
+            if (!title || !tag || !writer || !content) {
+                alert('All fields must be filled out');
+                return;
+            }
+
+            const token = sessionStorage.getItem('access_token');
+
+            $.ajax({
+                url: '/save',
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                },
+                data: JSON.stringify({
+                    title: title,
+                    tag: tag,
+                    writer: writer,
+                    content: content,
+                }),
+                success: function(response) {
+                    alert('Data saved successfully!');
+                },
+                error: function(error) {
+                    alert('Error saving data');
+                }
+            });
+        });
     </script>
 </body>
 </html>
