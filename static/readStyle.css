@@ -1,0 +1,278 @@
+#markdown-editor {
+    color: var(--tw-prose-body) !important;
+    max-width: 65ch !important;
+  }
+  
+  #markdown-editor p {
+    margin-top: 1.25em !important;
+    margin-bottom: 1.25em !important;
+  }
+  
+  #markdown-editor .lead {
+    color: var(--tw-prose-lead) !important;
+    font-size: 1.25em !important;
+    line-height: 1.6 !important;
+    margin-top: 1.5em !important;
+    margin-bottom: 1.5em !important;
+  }
+  
+  #markdown-editor a {
+    color: var(--tw-prose-links) !important;
+    text-decoration: underline !important;
+    font-weight: 500 !important;
+  }
+  
+  #markdown-editor strong {
+    color: var(--tw-prose-bold) !important;
+    font-weight: 600 !important;
+  }
+  
+  #markdown-editor a strong,
+  #markdown-editor blockquote strong,
+  #markdown-editor thead th strong {
+    color: inherit !important;
+  }
+  
+  #markdown-editor ol {
+    list-style-type: decimal !important;
+    margin-top: 1.25em !important;
+    margin-bottom: 1.25em !important;
+    padding-left: 1.375em !important;
+  }
+  
+  #markdown-editor ul {
+    list-style-type: disc !important;
+    margin-top: 1.25em !important;
+    margin-bottom: 1.25em !important;
+    padding-left: 1.375em !important;
+  }
+  
+  #markdown-editor ol > li::marker,
+  #markdown-editor ul > li::marker {
+    font-weight: 400 !important;
+    color: var(--tw-prose-counters) !important;
+  }
+  
+  #markdown-editor ul > li::marker {
+    color: var(--tw-prose-bullets) !important;
+  }
+  
+  #markdown-editor dt {
+    color: var(--tw-prose-headings) !important;
+    font-weight: 600 !important;
+  }
+  
+  #markdown-editor hr {
+    border-color: var(--tw-prose-hr) !important;
+    border-top-width: 1px !important;
+    margin-top: 3rem !important;
+    margin-bottom: 3rem !important;
+  }
+  
+  #markdown-editor blockquote {
+    font-weight: 500 !important;
+    font-style: italic !important;
+    color: var(--tw-prose-quotes) !important;
+    border-left-width: 0.25rem !important;
+    border-left-color: var(--tw-prose-quote-borders) !important;
+    quotes: "\\201C""\\201D""\\2018""\\2019" !important;
+    margin-top: 2em !important;
+    margin-bottom: 2em !important;
+    padding-left: 1.25em !important;
+  }
+  
+  #markdown-editor blockquote p:first-of-type::before {
+    content: open-quote !important;
+  }
+  
+  #markdown-editor blockquote p:last-of-type::after {
+    content: close-quote !important;
+  }
+  
+  #markdown-editor h1 {
+    color: var(--tw-prose-headings) !important;
+    font-weight: 800 !important;
+    font-size: 2.25em !important;
+    margin-top: 0 !important;
+    margin-bottom: 0.8888889em !important;
+    line-height: 1.1111111 !important;
+  }
+  
+  #markdown-editor h1 strong,
+  #markdown-editor h2 strong,
+  #markdown-editor h3 strong,
+  #markdown-editor h4 strong {
+    font-weight: inherit !important;
+    color: inherit !important;
+  }
+  
+  #markdown-editor h2 {
+    color: var(--tw-prose-headings) !important;
+    font-weight: 700 !important;
+    font-size: 1.5em !important;
+    margin-top: 1.5em !important;
+    margin-bottom: 0.75em !important;
+    line-height: 1.3333333 !important;
+  }
+  
+  #markdown-editor h3 {
+    color: var(--tw-prose-headings) !important;
+    font-weight: 600 !important;
+    font-size: 1.25em !important;
+    margin-top: 1.3333333em !important;
+    margin-bottom: 0.5em !important;
+    line-height: 1.3333333 !important;
+  }
+  
+  #markdown-editor h4 {
+    color: var(--tw-prose-headings) !important;
+    font-weight: 600 !important;
+    font-size: 1em !important;
+    margin-top: 1.5em !important;
+    margin-bottom: 0.5em !important;
+    line-height: 1.5 !important;
+  }
+  
+  #markdown-editor img,
+  #markdown-editor video,
+  #markdown-editor figure {
+    margin-top: 2em !important;
+    margin-bottom: 2em !important;
+  }
+  
+  #markdown-editor kbd {
+    font-weight: 500 !important;
+    font-family: inherit !important;
+    color: var(--tw-prose-kbd) !important;
+    box-shadow: 0 0 0 1px rgb(var(--tw-prose-kbd-shadows) / 10%) !important, 0 3px 0 rgb(var(--tw-prose-kbd-shadows) / 10%) !important;
+    font-size: 0.875em !important;
+    border-radius: 0.3125rem !important;
+    padding: 0.1875em 0.3125em !important;
+  }
+  
+  #markdown-editor code {
+    color: var(--tw-prose-code) !important;
+    font-weight: 600 !important;
+    font-size: 0.875em !important;
+  }
+  
+  #markdown-editor code::before,
+  #markdown-editor code::after {
+    content: "" !important;
+  }
+  
+  #markdown-editor a code,
+  #markdown-editor h1 code,
+  #markdown-editor h2 code,
+  #markdown-editor h3 code,
+  #markdown-editor h4 code,
+  #markdown-editor blockquote code,
+  #markdown-editor thead th code {
+    color: inherit !important;
+  }
+  
+  #markdown-editor pre {
+    color: var(--tw-prose-pre-code) !important;
+    background-color: var(--tw-prose-pre-bg) !important;
+    overflow-x: auto !important;
+    font-weight: 400 !important;
+    font-size: 0.875em !important;
+    line-height: 1.4 !important;
+    margin-top: 1.5em !important;
+    margin-bottom: 1.5em !important;
+    border-radius: 0.375rem !important;
+    padding: 0.75em 1em !important;
+  }
+  
+  #markdown-editor pre code {
+    background-color: transparent !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    font-weight: inherit !important;
+    color: inherit !important;
+    font-size: inherit !important;
+    font-family: inherit !important;
+    line-height: inherit !important;
+  }
+  
+  #markdown-editor pre code::before,
+  #markdown-editor pre code::after {
+    content: none !important;
+  }
+  
+  #markdown-editor table {
+    width: 100% !important;
+    table-layout: auto !important;
+    text-align: start !important;
+    margin-top: 2em !important;
+    margin-bottom: 2em !important;
+    font-size: 0.875em !important;
+    line-height: 1.4 !important;
+  }
+  
+  #markdown-editor thead {
+    border-bottom-width: 1px !important;
+    border-bottom-color: var(--tw-prose-th-borders) !important;
+  }
+  
+  #markdown-editor thead th {
+    color: var(--tw-prose-headings) !important;
+    font-weight: 600 !important;
+    vertical-align: bottom !important;
+    padding: 0.5em !important;
+  }
+  
+  #markdown-editor tbody tr {
+    border-bottom-width: 1px !important;
+    border-bottom-color: var(--tw-prose-td-borders) !important;
+  }
+  
+  #markdown-editor tbody tr:last-child {
+    border-bottom-width: 0 !important;
+  }
+  
+  #markdown-editor tbody td,
+  #markdown-editor tfoot td {
+    vertical-align: baseline !important;
+    padding: 0.5em !important;
+  }
+  
+  #markdown-editor tfoot {
+    border-top-width: 1px !important;
+    border-top-color: var(--tw-prose-th-borders) !important;
+  }
+  
+  #markdown-editor tfoot td {
+    vertical-align: top !important;
+  }
+  
+  #markdown-editor figure > * {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  
+  #markdown-editor figcaption {
+    color: var(--tw-prose-captions) !important;
+    font-size: 0.875em !important;
+    line-height: 1.4 !important;
+    margin-top: 0.75em !important;
+  }
+  
+  #markdown-editor blockquote::before,
+  #markdown-editor blockquote::after,
+  #markdown-editor h1::before,
+  #markdown-editor h1::after,
+  #markdown-editor h2::before,
+  #markdown-editor h2::after,
+  #markdown-editor h3::before,
+  #markdown-editor h3::after,
+  #markdown-editor h4::before,
+  #markdown-editor h4::after,
+  #markdown-editor code::before,
+  #markdown-editor code::after,
+  #markdown-editor pre code::before,
+  #markdown-editor pre code::after {
+    content: none !important;
+  }
+  
