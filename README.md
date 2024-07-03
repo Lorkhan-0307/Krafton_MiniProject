@@ -4,6 +4,9 @@ This is Repository for Krafton week 0 mini project
 
 -----
 @app.route('/wiki/show', methods=['GET']) => 각 테마 별로 날짜,좋아요 순으로 도큐먼트 리스트 반환. @app.route('/wiki/show+테마', methods=['GET']) 이런식으로 테마별 링크를 만들어 봅시다.
+----------->
+@app.route('/wiki', methods=['GET'])
+def wiki_page(): -> 요기로 합침(완)
 
 @app.route('/wiki/r', methods=['GET']) => 크게 볼 도큐먼트의 값을 주는 코드
 
