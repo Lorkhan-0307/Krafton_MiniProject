@@ -2,9 +2,10 @@ from flask import Flask, jsonify, request, render_template, redirect, url_for
 from flask_pymongo import PyMongo
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_required, get_jwt_identity, verify_jwt_in_request
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from bson.objectid import ObjectId
+from datetime import datetime as dt
+import datetime
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/mydatabase'  # MongoDB URI 설정
@@ -89,6 +90,9 @@ def signup():
     if user_collection.find_one({'userId': data['userId']}):
         return jsonify({'message': 'User already exists'}), 400
     
+    if user_collection.find_one({'userNickName': data['nickname']}):
+        return jsonify({'message': 'User Nickname already exists'}), 400
+    
     # Todo : 사용자 검증 들어가야함
 
     user_collection.insert_one({'userId': data['userId'], 'password': hashed_password, 'userrealname' : userrealname, 
@@ -154,6 +158,7 @@ def get_user_data():
 
 
 @app.route('/save', methods=['POST'])
+@jwt_required()
 def save():
     try:
         verify_jwt_in_request()
@@ -161,6 +166,28 @@ def save():
         title = data['title']
         writer = data['writer']
         content = data['content']
+        theme = data['theme']
+        isEditable = data['isEditable']
+
+         # 현재 시간 설정
+        try:
+            now_dt = dt.now()
+            print("Current time (datetime):", now_dt)
+        except Exception as e:
+            print("Error getting current time:", str(e))
+            return jsonify({"error": "Error getting current time"}), 500
+
+        # 마이크로초 생략하고 포맷 지정
+        formatted_now = now_dt.strftime('%Y-%m-%d %H:%M:%S')
+        print("Formatted current time:", formatted_now)
+
+        created_at = formatted_now
+        approved_at = formatted_now
+        updated_at = formatted_now
+
+        isUpdated = False
+        recommended = 0
+
 
         '''
         #### TextList
@@ -173,16 +200,25 @@ def save():
             - created_at
             - approved_at
             - updated_at
-            - isUpdated -> bool -> 검토가 필요한지
+            - isUpdated -> bool -> 검토가 필요한지 
+                -> isUpdated가 참이면 approve 가 필요하다.
         '''
 
         document = {
             'title': title,
-            'tag': tag,
             'writer': writer,
             'content': content,
-            'created_at': datetime.utcnow()  # 저장 시간을 추가
+            'isEditable': isEditable,
+            'theme': theme,
+            'created_at': created_at,
+            'approved_at': approved_at,
+            'updated_at': updated_at,
+            'isUpdated': isUpdated,
+            'recommended': recommended
         }
+
+        print(document)
+
         documents.insert_one(document)
 
         '''
@@ -191,12 +227,6 @@ def save():
         DB받기 : approved_at, isUpdated
         
         '''
-
-        
-        
-        # 여기서 데이터를 데이터베이스에 저장하거나 다른 작업을 수행합니다.
-        print(f"Title: {title}, Tag: {tag}, Writer: {writer}, Content: {content}")
-        
         return jsonify({"message": "Data saved successfully!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
