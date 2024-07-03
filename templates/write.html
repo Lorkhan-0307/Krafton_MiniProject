@@ -34,8 +34,8 @@
 
         .form-group {
             margin-bottom: 15px;
-            width: 80%;
-            max-width: 800px;
+            width: 100%;
+            max-width: 2000px;
         }
 
         label {
@@ -58,8 +58,8 @@
         }
 
         .editor-container {
-            width: 80%;
-            max-width: 800px;
+            width: 100%;
+            max-width: 2000px;
         }
     </style>
 </head>
@@ -138,9 +138,9 @@
             </div>
         </aside>
         <div class="flxed items-center p-4 sm:mx-64">
-            <div class="form-group">
+            <div class="flex form-group align-top">
                 <!-- 드롭다운 박스 -->
-                <form class="inline-block pr-3 max-w-sm mx-auto">
+                <form class="inline-block pr-3 max-w-sm items-center">
                     <select id="theme"
                         class="pr-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
                         <option selected>주제 선택</option>
@@ -155,15 +155,16 @@
                             {% endfor %} -->
                     </select>
                 </form>
+                <div class="inline-block ml-auto">
+                    <label for="writer" class="inline">글쓴이 :  </label>
+                    <p type="text" id="writer" name="writer" class="inline"></p>
+                </div>
 
-                <label for="writer" class="inline">글쓴이 : </label>
-                <p type="text" id="writer" name="writer" class="inline"></p>
-
-                <!-- 체크 박스 -->
-                <div class="inline-block items-center mb-2">
+                <!-- 체크 박스 --> 
+                <div class="inline-block">
+                    <label for="default-checkbox" class="inline ml-5 text-gray-900">수정가능</label>
                     <input id="isEditable" type="checkbox"
-                        class="ml-5 inline w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="default-checkbox" class="inline text-sm font-medium text-gray-900">수정가능</label>
+                        class="w-4 h-4 inline text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                 </div>
             </div>
             <div class="form-group items-center justify-between">
@@ -248,7 +249,7 @@
         }
 
         // Adjust the size of the editor dynamically
-        simplemde.codemirror.getWrapperElement().style.height = '500px';
+        simplemde.codemirror.getWrapperElement().style.height = '450px';
 
 
         // Submit button click event
