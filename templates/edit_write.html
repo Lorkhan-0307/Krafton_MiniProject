@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit to Wiki</title>
+    <title>Write to Wiki</title>
     <!-- SimpleMDE CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
     <!-- 테일윈드 -->
@@ -34,8 +34,8 @@
 
         .form-group {
             margin-bottom: 15px;
-            width: 80%;
-            max-width: 800px;
+            width: 100%;
+            max-width: 2000px;
         }
 
         label {
@@ -58,8 +58,8 @@
         }
 
         .editor-container {
-            width: 80%;
-            max-width: 800px;
+            width: 100%;
+            max-width: 2000px;
         }
     </style>
 </head>
@@ -96,6 +96,7 @@
                     </li>
                     <!-- TODO : 진자2
                     반복문을 사용하여 각 테마를 들고옴.
+
                     {% for ml in myList %} 
                     <li>
                         <a href="#"
@@ -137,45 +138,26 @@
             </div>
         </aside>
         <div class="flxed items-center p-4 sm:mx-64">
-            <div class="form-group">
+            <div class="flex form-group px-4 bg-gray-200">
                 <!-- 드롭다운 박스 -->
-                <form class="inline-block pr-3 max-w-sm mx-auto">
-                    <select id="theme"
-                        class="pr-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
-                        <option selected>주제 선택</option>
-                        <option value="ProgrammingLanguage">프로그래밍 언어</option>
-                        <option value="DataStructure">자료구조</option>
-                        <option value="Algorhythm">알고리즘</option>
-                        <option value="OperatingSystem">운영체제</option>
-                        <option value="Computerarchitecture">컴퓨터구조</option>
-                        <option value="Database">데이터베이스</option>
-                        <option value="LogitCircuit">논리회로</option>
-                        <option value="ComputerNetwork">컴퓨터 네트워크</option>
-                        <option value="Others">기타</option>
-
-                        <!-- TODO : 진자2
-                            각 테마 항목을 들고옴.
-                            {% for ml in myList %} 
-                            <option value="{{Theme}}">{{Theme}}</option>
-                            {% endfor %} -->
-                    </select>
-                </form>
-
-                <label for="writer" class="inline">글쓴이 : </label>
-                <p type="text" id="writer" name="writer" class="inline"></p>
-
-                <!-- 체크 박스 -->
-                <div class="inline-block items-center mb-2">
-                    <input id="isEditable" type="checkbox"
-                        class="ml-5 inline w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
-                    <label for="default-checkbox" class="inline text-sm font-medium text-gray-900">수정가능</label>
+                <label class="pt-3 fw-bold" type="text" id="theme" name="theme">[{{theme}}]</label>
+                <div class="inline ml-auto items-center text-center">
+                    <label id="approved_at" class="text-xs pt-2">최근 승인 날짜</label>
+                    <label id="approved_at" class="text-xs pb-2 fw-bold">{{approved_at}}</label>
+                </div>
+                <div class="inline ml-auto items-center">
+                    <label class="text-xs pt-2 fw-bold" type="text" id="Writer" name="Writer">글쓴이 : {{Writer}}</label>
+                    <label class="text-xs pb-2 fw-bold" type="text" id="original_writer" name="original_writer">최초 글쓴이 : {{original_writer}}</label>
                 </div>
             </div>
-            <div class="form-group items-center justify-between">
-                <input type="text" id="title" name="title" placeholder="제목을 입력하세요.">
+            <div class="form-group items-center justify-between fw-bold">
+                <input type="text" id="title" name="title" value="{{title}}">
             </div>
+
+            <!-- 콘텐츠 받아오기  -->
             <div class="form-group editor-container cursor-text items-center justify-between">
-                <textarea id="markdown-editor" placeholder="내용을 입력하세요."></textarea>
+                <textarea id="markdown-editor">{{content}}</textarea>
+                <!-- id="markdown-editor" -->
             </div>
             <div class="grid right-0 bg-gray-800">
                 <button type="submit" id="submit-btn"
@@ -253,7 +235,7 @@
         }
 
         // Adjust the size of the editor dynamically
-        simplemde.codemirror.getWrapperElement().style.height = '500px';
+        simplemde.codemirror.getWrapperElement().style.height = '450px';
 
 
         // Submit button click event
@@ -301,6 +283,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+        
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 
