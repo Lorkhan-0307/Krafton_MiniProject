@@ -1,14 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Write to Wiki</title>
     <!-- SimpleMDE CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <!-- 테일윈드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 부트스트랩 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
     <style>
-        body {
+        /* body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 20px;
@@ -18,19 +26,23 @@
             align-items: center;
             justify-content: flex-start;
             min-height: 100vh;
-        }
+        } */
+
         h1 {
             margin-bottom: 20px;
         }
+
         .form-group {
             margin-bottom: 15px;
             width: 80%;
             max-width: 800px;
         }
+
         label {
             display: block;
             margin-bottom: 5px;
         }
+
         input[type="text"] {
             width: 100%;
             padding: 10px;
@@ -39,51 +51,141 @@
             border-radius: 4px;
             box-sizing: border-box;
         }
+
         #markdown-editor {
             width: 100%;
             height: 500px;
         }
+
         .editor-container {
             width: 80%;
             max-width: 800px;
         }
     </style>
 </head>
+
 <body>
-    <h1>Write to Wiki</h1>
-    <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" id="title" name="title" placeholder="제목을 입력하세요.">
-    </div>
-    <div class="form-group">
-        <label for="tag">태그</label>
-        <input type="text" id="tag" name="tag" placeholder="태그를 입력하세요.">
-    </div>
-    <div class="form-group">
-        <label for="writer">글쓴이</label>
-        <p type="text" id="writer" name="writer"></p>
-    </div>
-    <div class="editor-container">
-        <label for="markdown-editor">Content</label>
-        <textarea id="markdown-editor"></textarea>
-    </div>
+    <div class="min-h-full">
+        <nav class="bg-gray-800 py-3">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center">
+                    <a href="#" class="text-2xl text-white mx-4 px-3">TerraWiki</a>
+                    <a href="#"
+                        class="text-center rounded-md bg-gray-900 ml-20 px-4 py-2 text-base font-medium text-white hover:bg-slate-600"
+                        aria-current="page">랜덤 게시물 이동</a>
+                </div>
+                <form onsubmit="submitForm(event)">
+                    <div class="flex items-center">
+                        <button type="submit"
+                            class="rounded-md bg-gray-900 mx-3 px-4 py-2 text-base font-medium text-white hover:bg-slate-600"
+                            aria-current="page">글쓰기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </nav>
 
-    
-    <button type="submit" id="submit-btn"
-            class="py-3 px-5 bg-gray-800 text-white mt-7 text-base rounded-lg focus:outline-none hover:opacity-90">
-            저장
-    </button>
+        <aside class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+            aria-label="Sidebar">
+            <div class="h-full px-3 py-4 bg-gray-50">
+                <ul class="space-y-2 font-medium">
+                    <li>
+                        <label href="#" class="items-center p-2 pb-4 text-xl text-gray-900 rounded-lg group">
+                            <span class="ms-3">주제</span>
+                        </label>
+                    </li>
+                    <!-- TODO : 진자2
+                    반복문을 사용하여 각 테마를 들고옴.
 
+                    {% for ml in myList %} 
+                    <li>
+                        <a href="#"
+                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group">
+                            <span class="flex-1 ms-3 whitespace-nowrap">{{ theme }}</span> : 테마
+                        </a>
+                    </li>
+                    {% endfor %} -->
+                </ul>
+            </div>
+        </aside>
+
+        <aside class="fixed right-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+            aria-label="Sidebar">
+            <div class="h-full px-3 py-4 bg-gray-50">
+                <div>
+                    <!-- TODO : 진자2
+                    오른쪽 프로필 네비게이션 부분
+                    src 프로필 사진 가져오기 
+                    
+                    <div class="inline-block">
+                        <img src="..." class="img-thumbnail">
+                    </div>-->
+                    <div class="inline-block">
+                        <!-- TODO : 진자2
+                        오른쪽 프로필 네비게이션 부분-->
+
+                        <label class="block">
+                            <span class="ms-3">이름 : {{ userRealname }}</span> <!--: 현재 로그인 된 계정의 본명-->
+                        </label>
+                        <label class="block">
+                            <span class="ms-3">닉네임 : {{ userNickname }}</span> <!--: 현재 로그인 된 계정의 닉네임-->
+                        </label>
+                        <label class="block">
+                            <span class="ms-3">작성글 수 : {{ userWrittenNum }}</span> <!--: 현재 로그인 된 계정의 작성글 수-->
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        <div class="flxed items-center p-4 sm:mx-64">
+            <div class="form-group">
+                <!-- 드롭다운 박스 -->
+                <form class="inline-block pr-3 max-w-sm mx-auto">
+                    <select id="theme"
+                        class="pr-20 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5">
+                        <option selected>주제 선택</option>
+                        <!-- TODO : 진자2
+                            각 테마 항목을 들고옴.
+                            {% for ml in myList %} 
+                            <option value="{{Theme}}">{{Theme}}</option>
+                            {% endfor %} -->
+                    </select>
+                </form>
+
+                <label for="writer" class="inline">글쓴이 : </label>
+                <p type="text" id="writer" name="writer" class="inline"></p>
+
+                <!-- 체크 박스 -->
+                <div class="inline-block items-center mb-2">
+                    <input id="isEditable" type="checkbox"
+                        class="ml-5 inline w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="default-checkbox" class="inline text-sm font-medium text-gray-900">수정가능</label>
+                </div>
+            </div>
+            <div class="form-group items-center justify-between">
+                <input type="text" id="title" name="title" placeholder="제목을 입력하세요.">
+            </div>
+            <div class="form-group editor-container cursor-text items-center justify-between">
+                <textarea id="markdown-editor" placeholder="내용을 입력하세요."></textarea>
+            </div>
+            <div class="grid right-0 bg-gray-800">
+                <button type="submit" id="submit-btn"
+                    class="py-2 px-5 bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90">
+                    저장
+                </button>
+            </div>
+        </div>
+    </div>
     <!-- SimpleMDE JS -->
     <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async function() {
+        document.addEventListener('DOMContentLoaded', async function () {
             const token = sessionStorage.getItem('access_token');
             if (!token) {
                 alert('ERROR')
                 window.location.href = '/login';
-            } 
-            
+            }
+
             const response = await fetch('/verification', {
                 method: 'GET',
                 headers: {
@@ -116,8 +218,8 @@
         simplemde.codemirror.getWrapperElement().style.height = '500px';
 
 
-         // Submit button click event
-         document.getElementById('submit-btn').addEventListener('click', function() {
+        // Submit button click event
+        document.getElementById('submit-btn').addEventListener('click', function () {
             const title = document.getElementById('title').value;
             const tag = document.getElementById('tag').value;
             const writer = document.getElementById('writer').innerText;
@@ -143,14 +245,19 @@
                     writer: writer,
                     content: content,
                 }),
-                success: function(response) {
+                success: function (response) {
                     alert('Data saved successfully!');
                 },
-                error: function(error) {
+                error: function (error) {
                     alert('Error saving data');
                 }
             });
         });
     </script>
+    <!-- 부트스트랩 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>
