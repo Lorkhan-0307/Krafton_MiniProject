@@ -114,20 +114,6 @@ lastModifiedTime]]
 </head>
 
 <body>
-    <!-- test area -->
-    <h1>Articles</h1>
-    <ul>
-        <li>
-            <a href="{{ url_for('view_post', id='668527ae39d5baec43cbde12') }}">test</a>
-        </li>
-    </ul>
-    <h1>Articles2</h1>
-    <ul>
-        {% for article in documents_ProgrammingLanguage_date %}
-            <li>
-                <a href="{{ url_for('view_post', id=article._id) }}">{{ article.title }}</a>
-            </li>
-        {% endfor %}
     <div class="min-h-full">
         <nav class="bg-gray-800 py-3">
             <div class="flex h-16 items-center justify-between">
@@ -200,6 +186,7 @@ lastModifiedTime]]
                 </div>
             </div>
         </aside>
+        
 
         <div class="p-3 sm:mx-64">
             <table class="table table-sm table-striped">

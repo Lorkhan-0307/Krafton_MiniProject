@@ -195,19 +195,6 @@ def verification():
 def getWrittenNum(userNickname):
     return documents.count_documents({'writer': userNickname})
 
-@app.route('/getUserData', methods=['GET'])
-@jwt_required()
-def get_user_data():
-    claims = get_jwt()
-    user_info = claims['sub']
-    userRealname = user_info.get('userRealName')
-    print(userRealname)
-    userNickname = user_info.get('userNickName')
-    userWrittenNum = documents.count_documents({'writer': userNickname})
-    print(userNickname)
-    print(documents.count_documents({'writer': userNickname}))
-    print(documents.count_documents({'writer': 'JinJaewoong11'}))
-    return jsonify(userRealname=userRealname, userNickname=userNickname, userWrittenNum = userWrittenNum)
 
 
 @app.route('/getUserData', methods=['GET'])
@@ -215,10 +202,7 @@ def get_user_data():
 def get_user_data():
     claims = get_jwt()
     user_info = claims['sub']
-    user_real_name = user_info.get('userRealName')
-    user_nick_name = user_info.get('userNickName')
     userRealname = user_info.get('userRealName')
-    print(userRealname)
     userNickname = user_info.get('userNickName')
     userWrittenNum = documents.count_documents({'writer': userNickname})
     return jsonify(userRealname=userRealname, userNickname=userNickname, userWrittenNum = userWrittenNum)
