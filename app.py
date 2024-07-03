@@ -220,24 +220,5 @@ def write_new_title():
         return jsonify({'message': '타이틀이 이미 존재합니다. 다른 타이틀을 골라주세요.','result' : 'fail'}), 403
     
     return jsonify({'message': '타이틀이 유효합니다.', 'result': 'success'}), 200
-
-# # 몽고 디비 도큐먼트 데이더베이스 연습 코드
-# a = {
-#     'writer':'john',
-#     'created_at':'2024.07.03',
-#     'tag':'python',
-#     'likes': 3,
-#     'theme':'week0'
-# }
-# b = {
-#     'writer':'john',
-#     'created_at':'2024.07.03',
-#     'tag':'python2',
-#     'likes': 2,
-#     'theme':'week1'
-# }
-# mongo.db.documents.insert_one(a)
-# mongo.db.documents.insert_one(b)
-
 if __name__ == '__main__':
     app.run(debug=True)
