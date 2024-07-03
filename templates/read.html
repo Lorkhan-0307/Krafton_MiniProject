@@ -16,26 +16,10 @@
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
         crossorigin="anonymous"></script>
     <style>
-        /* body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-        } */
-
-        h1 {
-            margin-bottom: 20px;
-        }
-
         .form-group {
             margin-bottom: 15px;
             width: 100%;
-            max-width: 800px;
+            max-width: 2000px;
         }
 
         label {
@@ -54,7 +38,7 @@
 
         #markdown-editor {
             width: 100%;
-            height: 400px;
+            height: 540px;
         }
     </style>
 </head>
@@ -163,7 +147,7 @@
             </div>
             <div class="form-group items-center justify-between">
                 <!-- 게시물 내용 받아오기 -->
-                <textarea class="border-2" id="markdown-editor" disabled>{{text}}</textarea>
+                <textarea class="border-2" id="markdown-editor" disabled>{{content}}</textarea>
             </div>
             <div class="flex">
                 <button type="submit" id="like-btn"
@@ -175,9 +159,9 @@
 
                 <button type="submit" id="edit-btn"
                     class="py-2 px-5 ml-auto bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90">
+                    수정
                     <!-- 수정 게시물 존재 여부에따라 수정 버튼과 검토 버튼 구분 -->
                     <!-- {% if 수정게시물 == False %} -->
-                    수정
                     <!-- {% else %}
                     수정 게시물 검토
                     {% endif %} -->
@@ -210,24 +194,7 @@
                 window.location.href = '{{ url_for("login") }}';
             }
         });
-
-        // Initialize SimpleMDE
-        var simplemde = new SimpleMDE({
-            element: document.getElementById("markdown-editor"),
-            spellChecker: false,  // Disable spell checker
-            autosave: {
-                enabled: true,
-                uniqueId: "markdown-editor",
-                delay: 1000,
-            },
-            status: ["autosave", "lines", "words", "cursor"],  // Status bar items
-        });
-
-        // Adjust the size of the editor dynamically
-        simplemde.codemirror.getWrapperElement().style.height = '500px';
-
-
-        // Submit button click event
+        
         document.getElementById('submit-btn').addEventListener('click', function () {
             const title = document.getElementById('title').value;
             const tag = document.getElementById('tag').value;
