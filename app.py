@@ -46,11 +46,31 @@ def wiki_page():
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.form
+
+    # 비밀번호 및 비밀번호 확인 비교
+    if(data['password'] != data['passwordCheck']):
+        return jsonify({'message': 'Password incorrect with Password Check'}), 400
+
+
     hashed_password = generate_password_hash(data['password'], method='pbkdf2:sha256')
+    userrealname = data['realname']
+    usernickname = data['nickname']
+    useridentification = data['phoneNum']
+    
+    if(userrealname == "이승민" or userrealname == "최자영" or userrealname == "진재웅"):
+        userauthorization = "Admin"
+    else :
+        userauthorization = "User"
+
     user_collection = mongo.db.users
     if user_collection.find_one({'username': data['username']}):
         return jsonify({'message': 'User already exists'}), 400
-    user_collection.insert_one({'username': data['username'], 'password': hashed_password})
+    
+    # Todo : 사용자 검증 들어가야함
+
+    user_collection.insert_one({'username': data['username'], 'password': hashed_password, 'userrealname' : userrealname, 
+                                'usernickname': usernickname, 'useridentification': useridentification,
+                                'userauthorization': userauthorization})
     return redirect(url_for('login_page'))
 
 @app.route('/write_page', methods=['GET'])
