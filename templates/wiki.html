@@ -6,6 +6,8 @@ theme
 userRealname
 userWrittenNum
 
+이 부분은 취소...
+
 최신 게시물
 [[title
 writer
@@ -28,6 +30,8 @@ lastModifiedTime]]
             alert('ERROR')
             window.location.href = '/login';
         }
+
+        getUserData();
 
         const response = await fetch('{{ url_for("wiki") }}', {
             method: 'POST',
@@ -71,6 +75,30 @@ lastModifiedTime]]
             console.error('Error:', response.statusText);
         }
     }
+    function getUserData(){
+        const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert('Access token is missing!');
+                return;
+            }
+
+        $.ajax({
+            url: '/getUserData',
+            type: 'GET',
+            contentType: 'application/json',
+            headers: {
+                'Authorization': 'Bearer ' + accessToken
+            },
+            success: function(response){
+                document.getElementById('userRealname').innerText = "이름 : " + response.userRealname;
+                document.getElementById('userNickname').innerText = "닉네임 : " + response.userNickname;
+                document.getElementById('userWrittenNum').innerText = "작성글 수 : " + response.userWrittenNum;
+            },
+            error: function(error){
+
+            }
+        }); 
+    }
 </script>
 
 <head>
@@ -78,6 +106,7 @@ lastModifiedTime]]
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 테일윈드 -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <title>Wiki Page</title>
     <!-- 부트스트랩 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -146,13 +175,13 @@ lastModifiedTime]]
                         오른쪽 프로필 네비게이션 부분-->
 
                         <label class="block">
-                            <span class="ms-3">이름 : {{ userRealname }}</span> <!--: 현재 로그인 된 계정의 본명-->
+                            <span class="ms-3" id="userRealname">이름 : </span> <!--: 현재 로그인 된 계정의 본명-->
                         </label>
                         <label class="block">
-                            <span class="ms-3">닉네임 : {{ userNickname }}</span> <!--: 현재 로그인 된 계정의 닉네임-->
+                            <span class="ms-3" id="userNickname">닉네임 :</span> <!--: 현재 로그인 된 계정의 닉네임-->
                         </label>
                         <label class="block">
-                            <span class="ms-3">작성글 수 : {{ userWrittenNum }}</span> <!--: 현재 로그인 된 계정의 작성글 수-->
+                            <span class="ms-3" id="userWrittenNum">작성글 수 : </span> <!--: 현재 로그인 된 계정의 작성글 수-->
                         </label> 
                     </div>
                 </div>
