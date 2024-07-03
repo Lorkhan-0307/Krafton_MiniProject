@@ -246,6 +246,16 @@ lastModifiedTime]]
                         <td>{{ lastModifiedTime }}</td> : 수정 시간
                     </tr>
                     {% endfor %} -->
+
+                    {% for documents in documents_theme_like %}
+                    <tr>
+                        <th scope="row" colspan="3">
+                            <a href="/wiki/r/{{documents['_id']}}" class="hover:text-blue-400 hover:cursor-pointer">{{ documents['title'] }}</span>
+                        </th>
+                        <td>{{ documents['writer'] }}</td>
+                        <td>{{ documents['approved_at'] }}</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
