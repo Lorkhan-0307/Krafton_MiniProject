@@ -13,6 +13,19 @@ app.config['SECRET_KEY'] = 'super-secret'
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)
 
+
+themesList = [
+    ("ProgrammingLanguage", "프로그래밍 언어"),
+    ("DataStructure", "자료구조"),
+    ("Algorithm", "알고리즘"),
+    ("OperatingSystem", "운영체제"),
+    ("ComputerArchitecture", "컴퓨터구조"),
+    ("Database", "데이터베이스"),
+    ("LogicCircuit", "논리회로"),
+    ("ComputerNetwork", "컴퓨터 네트워크"),
+    ("Others", "기타")
+]
+
 mongo = PyMongo(app)
 jwt = JWTManager(app)
 
@@ -83,7 +96,7 @@ def wiki_page():
     documents_Others_like = list(mongo.db.documents.find({'theme':'Others'}).sort('recommended', -1))
 
 
-    return render_template('wiki.html',
+    return render_template('wiki.html',  themesList=themesList,
                             documents_ProgrammingLanguage_date=documents_ProgrammingLanguage_date,
                             documents_ProgrammingLanguage_like=documents_ProgrammingLanguage_like,
                             documents_DataStructure_date=documents_DataStructure_date,
@@ -138,7 +151,7 @@ def signup():
 
 @app.route('/write_page', methods=['GET'])
 def write_page():
-    return render_template('write.html')
+    return render_template('write.html', themesList=themesList)
 
 @app.route('/write', methods=['POST'])
 @jwt_required()
