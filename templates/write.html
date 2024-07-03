@@ -265,6 +265,11 @@
                 return;
             }
 
+            if(theme === "주제 선택"){
+                alert('주제를 선택해주세요!')
+                return;
+            }
+
             const token = sessionStorage.getItem('access_token');
 
             // 만약 수정 가능인 게시물일시... 

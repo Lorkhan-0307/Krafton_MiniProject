@@ -227,6 +227,7 @@
         
         function redirectToEdit(event, postId) {
             event.preventDefault();
+            localStorage.removeItem('smde_markdown-editor');
             window.location.href = `/wiki/e/${postId}`;
         }
 

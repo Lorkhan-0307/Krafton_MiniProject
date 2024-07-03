@@ -33,6 +33,7 @@ jwt = JWTManager(app)
 
 
 documents = mongo.db.documents
+edited_documents = mongo.db.edited_documents
 
 @app.route('/', methods=['GET'])
 def login_page():
@@ -238,6 +239,85 @@ def save():
         return jsonify({"error": str(e)}), 400
 
 
+@app.route('/editsave', methods=['POST'])
+@jwt_required()
+def edit_save():
+    try:
+        verify_jwt_in_request()
+        data = request.get_json()
+        title = data['title']
+
+        post = documents.find_one({'title': title, 'isEditable': True})
+        original_post_id = str(post['_id'])
+        writer = data['writer']
+        original_writer = data['original_writer']
+        content = data['content']
+        theme = data['theme']
+        isEditable = data['isEditable']
+        created_at = post['created_at']
+        approved_at = post['approved_at']
+
+         # 현재 시간 설정
+        try:
+            now_dt = dt.now()
+            print("Current time (datetime):", now_dt)
+        except Exception as e:
+            print("Error getting current time:", str(e))
+            return jsonify({"error": "Error getting current time"}), 500
+
+        # 마이크로초 생략하고 포맷 지정
+        formatted_now = now_dt.strftime('%Y-%m-%d %H:%M:%S')
+        print("Formatted current time:", formatted_now)
+
+        updated_at = formatted_now
+
+        isUpdated = True
+        recommended = post['recommended']
+
+
+        '''
+        #### TextList
+            - Key
+            - Title
+            - Theme(For Navigation)
+            - Content
+            - Writer
+            - isEditable(수정 가능한지)
+            - created_at
+            - approved_at
+            - updated_at
+            - isUpdated -> bool -> 검토가 필요한지 
+                -> isUpdated가 참이면 approve 가 필요하다.
+        '''
+
+        document = {
+            'title': title,
+            'writer': writer,
+            'original_post_id': original_post_id,
+            'original_writer': original_writer,
+            'content': content,
+            'isEditable': isEditable,
+            'theme': theme,
+            'created_at': created_at,
+            'approved_at': approved_at,
+            'updated_at': updated_at,
+            'isUpdated': isUpdated,
+            'recommended': recommended
+        }
+
+
+        edited_documents.insert_one(document)
+
+        '''
+        Client받기 : Title, Theme, Content, Writer, isEditable
+        생성하기: created at or updated at
+        DB받기 : approved_at, isUpdated
+        '''
+        return jsonify({"message": "Data saved successfully!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 400
+
+
 
 # 특정 게시물의 ID값을 받아 내용을 전달.
 @app.route('/wiki/r/<id>', methods=['GET'])
@@ -263,7 +343,7 @@ def edit_page(id):
     if post.get('isUpdated', False):
         return redirect(url_for('readedit_page', id=id))
 
-    content = markdown.markdown(post['content'])
+    content = post['content']
     created_at = post['created_at']
     recommended = post['recommended']
     theme = post['theme']

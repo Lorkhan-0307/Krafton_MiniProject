@@ -137,14 +137,20 @@
         <div class="flxed items-center p-4 sm:mx-64">
             <div class="flex form-group px-4 bg-gray-200">
                 <!-- 드롭다운 박스 -->
-                <label class="pt-3 fw-bold" type="text" id="theme" name="theme">[{{theme}}]</label>
+                <label class="pt-3 fw-bold" type="text" id="theme" name="theme">{{theme}}</label>
                 <div class="inline ml-auto items-center text-center">
                     <label id="approved_at" class="text-xs pt-2">최근 승인 날짜</label>
-                    <label id="approved_at" class="text-xs pb-2 fw-bold">{{approved_at}}</label>
+                    <label id="approved_at" class="text-xs pb-2 fw-bold">{{post['approved_at']}}</label>
                 </div>
                 <div class="inline ml-auto items-center">
-                    <label class="text-xs pt-2 fw-bold" type="text" id="Writer" name="Writer">글쓴이 : {{Writer}}</label>
-                    <label class="text-xs pb-2 fw-bold" type="text" id="original_writer" name="original_writer">최초 글쓴이 : {{original_writer}}</label>
+                    <div>
+                        <label for="writer" class="text-xs pt-2 fw-bold inline">글쓴이 :  </label>
+                        <p type="text" id="Writer" name="writer" class="inline">{{Writer}}</p>
+                    </div>
+                    <div>
+                        <label for="writer" class="text-xs pt-2 fw-bold  inline">최초 글쓴이 :  </label>
+                        <p type="text" id="original_writer" name="writer" class="inline">{{post['writer']}}</p>
+                    </div>
                 </div>
             </div>
             <div class="form-group items-center justify-between px-2">
@@ -159,7 +165,7 @@
             </div>
             <div class="grid right-0 bg-gray-800">
                 <button type="submit" id="submit-btn"
-                    class="py-2 px-5 bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90">
+                    class="py-2 px-5 bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:acity-90">
                     저장
                 </button>
             </div>
@@ -187,7 +193,7 @@
 
             if (response.ok) {
                 const data = await response.json();
-                document.getElementById('Writer').innerText = '글쓴이 : '+ `${data.logged_in_as}`;
+                document.getElementById('Writer').innerText = `${data.logged_in_as}`;
             } else {
                 localStorage.removeItem('access_token');
                 window.location.href = '{{ url_for("login") }}';
@@ -238,11 +244,12 @@
 
         // Submit button click event
         document.getElementById('submit-btn').addEventListener('click', function () {
-            const title = document.getElementById('title').value;
+            const title = document.getElementById('title').innerText;
             const writer = document.getElementById('Writer').innerText;
+            const original_writer = document.getElementById('original_writer').innerText;
             const content = simplemde.value();
-            const theme = document.getElementById('theme').value;
-            const isEditable = document.getElementById('isEditable').checked;
+            const theme = document.getElementById('theme').innerText;
+            const isEditable = true;
 
             if (!title ||  !writer || !content || !theme) {
                 alert('All fields must be filled out');
@@ -254,7 +261,7 @@
             // 만약 수정 가능인 게시물일시... 
 
             $.ajax({
-                url: '/save',
+                url: '/editsave',
                 method: 'POST',
                 contentType: 'application/json',
                 headers: {
@@ -262,6 +269,7 @@
                 },
                 data: JSON.stringify({
                     title: title,
+                    original_writer: original_writer,
                     writer: writer,
                     content: content,
                     theme: theme,
