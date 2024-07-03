@@ -110,6 +110,10 @@ def signup():
 def write_page():
     return render_template('write.html', themesList=themesList)
 
+@app.route('/wiki/ongoing', methods=['GET'])
+def wiki_ongoing_page():
+    return render_template('wiki_ongoing.html', themesList=themesList)
+
 @app.route('/write', methods=['POST'])
 @jwt_required()
 def write():
@@ -432,5 +436,38 @@ def get_documents():
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+    
+
+
+@app.route('/get_documents_ongoing', methods=['GET'])
+def get_documents_ongoing():
+    try:
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 10))
+        theme = request.args.get('theme', '')
+
+        edited_documents = mongo.db.edited_documents
+        query = {'theme': theme} if theme else {}
+
+        total_documents = edited_documents.count_documents(query)
+        total_pages = math.ceil(total_documents / limit)
+
+        sort_field = 'updated_at'
+
+        documents_theme_date = list(edited_documents.find(query).sort(sort_field, -1).skip((page - 1) * limit).limit(limit))
+
+        # Convert ObjectId to string for JSON serialization
+        for doc in documents_theme_date:
+            doc['_id'] = str(doc['_id'])
+
+        return jsonify({
+            'documents': documents_theme_date,
+            'total_pages': total_pages,
+            'current_page': page
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)
