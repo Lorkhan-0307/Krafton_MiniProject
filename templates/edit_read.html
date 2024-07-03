@@ -37,7 +37,7 @@
         }
 
         #markdown-editor {
-            width: 100%;
+            width: 30vw;
             height: 400px;
         }
     </style>
@@ -152,12 +152,12 @@
                     <div class="inline mr-2">
                         <!-- 수정 전 게시물 내용 받아오기 -->
                         <label class="inline fw-bold pr-auto" name="title">수정 전 게시물</label>
-                        <div id="markdown-editor" style="overflow:scroll;width:70vw;">{{ content|safe }}</div>
+                        <div id="markdown-editor" style="overflow:scroll;">{{ content|safe }}</div>
                     </div>
                     <div class="inline">
                         <!-- 수정 후 게시물 내용 받아오기 -->
                         <label class="inline fw-bold pr-auto" name="title">수정 후 게시물</label>
-                        <div id="markdown-editor" style="overflow:scroll;width:70vw;">{{ content|safe }}</div>
+                        <div id="markdown-editor" style="overflow:scroll;">{{ content|safe }}</div>
                     </div>
                 </div>
             </div>
