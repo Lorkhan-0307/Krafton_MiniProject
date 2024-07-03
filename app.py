@@ -25,11 +25,11 @@ def login_page():
 def login():
     data = request.form
     user_collection = mongo.db.users
-    user = user_collection.find_one({'username': data['username']})
+    user = user_collection.find_one({'userId': data['userId']})
     if not user or not check_password_hash(user['password'], data['password']):
         return jsonify({'message': 'Invalid credentials'}), 401
 
-    access_token = create_access_token(identity={'username': user['username']})
+    access_token = create_access_token(identity={'userId': user['userId']})
     return jsonify(access_token=access_token), 200
 
 @app.route('/signup', methods=['GET'])
@@ -40,9 +40,30 @@ def signup_page():
 def redirection_page():
     return render_template('redirection.html')
 
+# wiki.html로 db 올리기.
 @app.route('/wiki', methods=['GET'])
 def wiki_page():
-    return render_template('wiki.html') 
+    documents_all_date = list(mongo.db.documents.find({}).sort('created_at', -1))
+    documents_all_like = list(mongo.db.documents.find({}).sort('likes', -1))
+
+        # week0의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_week0_date = list(mongo.db.documents.find({'theme':'week0'}).sort({'created_at':-1}))
+    documents_week0_like = list(mongo.db.documents.find({'theme':'week0'}).sort({'likes':-1}))
+
+        # week01의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_week1_date = list(mongo.db.documents.find({'theme':'week1'}).sort({'created_at':-1}))
+    documents_week1_like = list(mongo.db.documents.find({'theme':'week1'}).sort({'likes':-1}))
+
+        # week2의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_week2_date = list(mongo.db.documents.find({'theme':'week2'}).sort({'created_at':-1}))
+    documents_week2_like = list(mongo.db.documents.find({'theme':'week2'}).sort({'likes':-1}))
+
+    return render_template('wiki.html',
+    documents_all_date=documents_all_date, documents_all_like=documents_all_like,
+    documents_week0_date=documents_week0_date,documents_week0_like=documents_week0_like,
+    documents_week1_date=documents_week1_date, documents_week1_like=documents_week1_like,
+    documents_week2_date=documents_week2_date, documents_like=documents_week2_like
+    ) 
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -148,49 +169,6 @@ def save():
         return jsonify({"error": str(e)}), 400
 
 
-# # @app.route('/wiki/show+테마', methods=['GET']) => 이렇게 바꿔서 테마 버튼을 눌렀을 때 ,바로 정보가 올라오게. 그렇게 아래에서 수정.
-@app.route('/wiki/show/week_all', methods=['GET'])
-def read_articles_by_all():
-    
-    # 모든 도큐먼트의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    # documents_all_date = list(mongo.db.documents.find({}).sort({'created_at':-1}))
-    # documents_all_like = list(mongo.db.documents.find({}).sort({'likes':-1}))
-    # 날짜 순으로 정렬된 문서와 좋아요 순으로 정렬된 문서를 리스트로 변환
-    documents_all_date = list(mongo.db.documents.find({}).sort('created_at', -1))
-    documents_all_like = list(mongo.db.documents.find({}).sort('likes', -1))
-    
-    # 디버깅을 위해 데이터 출력
-    print('documents_all_date:', documents_all_date)
-    print('documents_all_like:', documents_all_like)
-    
-    return render_template('wiki.html', documents_all_date=documents_all_date, documents_all_like=documents_all_like)
-
-@app.route('/wiki/show/week0', methods=['GET'])
-def read_articles_by_week0():
-    
-    # week0의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_week0_date = list(mongo.db.documents.find({'theme':'week0'}).sort({'created_at':-1}))
-    documents_week0_like = list(mongo.db.documents.find({'theme':'week0'}).sort({'likes':-1}))
-    
-    return render_template('wiki.html', documents_week0_date=documents_week0_date, documents_week0_like=documents_week0_like)
-
-@app.route('/wiki/show/week1', methods=['GET'])
-def read_articles_by_week1():
-    
-    # week01의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_week1_date = list(mongo.db.documents.find({'theme':'week1'}).sort({'created_at':-1}))
-    documents_week1_like = list(mongo.db.documents.find({'theme':'week1'}).sort({'likes':-1}))
-    
-    return render_template('wiki.html', documents_week1_date=documents_week1_date, documents_week1_like=documents_week1_like)
-
-@app.route('/wiki/show/week2', methods=['GET'])
-def read_articles_by_week2():
-    
-    # week2의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_week2_date = list(mongo.db.documents.find({'theme':'week2'}).sort({'created_at':-1}))
-    documents_week2_like = list(mongo.db.documents.find({'theme':'week2'}).sort({'likes':-1}))
-    
-    return render_template('wiki.html', documents_week2_date=documents_week2_date, documents_like=documents_week2_like)
 
 # 특정 게시물의 ID값을 받아 내용을 전달.
 @app.route('/wiki/read', methods=['GET'])
@@ -234,6 +212,7 @@ def like_article():
 
 #     return render_template('wiki/r.html', article = article)
 
+#  겹치는 타이틀이 있는지 없는지.
 @app.route('/wiki/w', methods=['GET'])
 def write_new_title():
     title_receive = request.args['title_give']
