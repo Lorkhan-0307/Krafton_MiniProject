@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 from flask_jwt_extended.exceptions import NoAuthorizationError
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/mydatabase'  # MongoDB URI 설정
@@ -145,6 +146,65 @@ def save():
         return jsonify({"message": "Data saved successfully!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
+
+
+# # @app.route('/wiki/show+테마', methods=['GET']) => 이렇게 바꿔서 테마 버튼을 눌렀을 때 ,바로 정보가 올라오게. 그렇게 아래에서 수정.
+@app.route('/wiki/show/mini', methods=['GET'])
+def read_articles_by():
+    
+
+    #날짜,좋아요 순으로 정렬해서 table로 보냄
+    
+    return render_template('wiki.html', articles_date=articles_date, articles_like=articles_like)
+
+@app.route('/wiki/r', methods=['GET'])
+def read_articles():
+    data = request.args
+    id_receive = data['id_give']
+
+    id_receive = request.args.get('id_give')
+    try:
+        # ObjectId로 변환
+        article_id = ObjectId(id_receive)
+    except:
+        return "Invalid ID format", 400
+    
+    article = mongo.db.documents.find_one({'_id':article_id})
+
+    return render_template('wiki/r.html', article=article)
+
+@app.route('/wiki/like', methods=['POST'])
+def like_article():
+    #클라이언트로부터 _id 받기.
+    id_receive = request.form['id_give']
+    article_id = ObjectId(id_receive)
+
+    article = mongo.db.documents.find_one({'_id':article_id})
+    
+    #받은 id에 해당하는 like +1
+    new_like = article['likes'] + 1
+    
+    #몽고db에 업데이트
+    mongo.db.documents.update_one({'_id': article_id}, {'$set': {'likes': new_like}})
+
+    return jsonify({'result': 'success', 'msg': 'success'})
+
+#랜덤 게시물은 나중에 추가.
+# @app.route('/wiki/random', methods=['GET'])
+# def random_articles():
+#     articles = list(mongo.db.documents.find({}))
+#     ranNum = random.randrange(0,len(articles) - 1)
+#     article = articles[ranNum]
+
+#     return render_template('wiki/r.html', article = article)
+
+@app.route('/wiki/w', methods=['GET'])
+def write_new_title():
+    title_receive = request.args['title_give']
+    if mongo.db.documents.count_documents({'Title': title_receive}, limit=1) > 0:
+        return jsonify({'message': '타이틀이 이미 존재합니다. 다른 타이틀을 골라주세요.','result' : 'fail'}), 403
+    
+    return jsonify({'message': '타이틀이 유효합니다.', 'result': 'success'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
