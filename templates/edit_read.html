@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Write to Wiki</title>
+    <!-- SimpleMDE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <!-- 테일윈드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 부트스트랩 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../../static/readStyle.css">
+    <style>
+        .form-group {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        #markdown-editor {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 첫번째줄
+    날짜, 제목, 글쓴이
+    본문내용
+    에딧 버튼 -->
+
+    <div class="min-h-full">
+        <nav class="bg-gray-800 py-3">
+            <div class="flex h-16 items-center justify-between">
+                <div class="flex items-center">
+                    <a href="/wiki" class="text-2xl text-white mx-4 px-3">TerraWiki</a>
+                    <a href="#"
+                        class="text-center rounded-md bg-gray-900 ml-20 px-4 py-2 text-base font-medium text-white hover:bg-slate-600"
+                        aria-current="page">랜덤 게시물 이동</a>
+                </div>
+                <form onsubmit="submitForm(event)">
+                    <div class="flex items-center">
+                        <button type="submit"
+                            class="rounded-md bg-gray-900 mx-3 px-4 py-2 text-base font-medium text-white hover:bg-slate-600"
+                            aria-current="page">글쓰기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </nav>
+
+        <aside class="fixed left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+            aria-label="Sidebar">
+            <div class="h-full px-3 py-4 bg-gray-50">
+                <ul class="space-y-2 font-medium">
+                    <li>
+                        <label href="#" class="items-center p-2 pb-4 text-xl text-gray-900 rounded-lg group">
+                            <span class="ms-3">주제</span>
+                        </label>
+                    </li>
+                    <!-- TODO : 진자2
+                    반복문을 사용하여 각 테마를 들고옴.
+
+                    {% for ml in myList %} 
+                    <li>
+                        <a href="#"
+                            class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group">
+                            <span class="flex-1 ms-3 whitespace-nowrap">{{ theme }}</span> : 테마
+                        </a>
+                    </li>
+                    {% endfor %} -->
+                </ul>
+            </div>
+        </aside>
+
+        <aside class="fixed right-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+            aria-label="Sidebar">
+            <div class="h-full px-3 py-4 bg-gray-50">
+                <div>
+                    <!-- TODO : 진자2
+                    오른쪽 프로필 네비게이션 부분
+                    src 프로필 사진 가져오기 
+                    
+                    <div class="inline-block">
+                        <img src="..." class="img-thumbnail">
+                    </div>-->
+                    <div class="inline-block">
+                        <!-- TODO : 진자2
+                        오른쪽 프로필 네비게이션 부분-->
+
+                        <label class="block">
+                            <span class="ms-3" id="userRealname">이름 : </span> <!--: 현재 로그인 된 계정의 본명-->
+                        </label>
+                        <label class="block">
+                            <span class="ms-3" id="userNickname">닉네임 :</span> <!--: 현재 로그인 된 계정의 닉네임-->
+                        </label>
+                        <label class="block">
+                            <span class="ms-3" id="userWrittenNum">작성글 수 : </span> <!--: 현재 로그인 된 계정의 작성글 수-->
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="items-center pb-4 sm:mx-64">
+            <div class="flex form-group px-4 bg-gray-200">
+                <!-- TODO : writer, approved_at, likeNum 서버에서 받아오기 -->
+                <label id="writer" class="inline mr-auto pt-3 fw-bold">{{ post['writer'] }}</label>
+                <div class="inline mr-auto items-center text-center">
+                    <label id="approved_at" class="text-xs pt-2">최근 승인 날짜</label>
+                    <label id="approved_at" class="text-xs fw-bold">{{ post['approved_at'] }}</label>
+                </div>
+                <label id="like" class="inline pt-3 fw-bold">좋아요 : {{post['recommended']}}</label>
+            </div>
+            <div class="flex form-group items-center justify-between px-8">
+                <!-- theme 받아오기 -->
+                <label type="text" id="theme" name="theme">[{{post['theme']}}]</label>
+                <div>
+                    <label class="text-xs" type="text" id="updated_at" name="updated_at">최종 수정 날짜 :
+                        {{post['updated_at']}}</label>
+                    <label class="text-xs" type="text" id="created_at" name="created_at">최초 작성 날짜 :
+                        {{post['created_at']}}</label>
+                </div>
+            </div>
+            <div class="form-group items-center justify-between px-8">
+                <!-- title 받아오기 -->
+                <label class="h2 fw-bold py-6" type="text" id="title" name="title">{{post['title']}}</label>
+            </div>
+
+            <div class="grid place-items-center">
+                <div class="flex">
+                    <div class="inline mr-2">
+                        <!-- 수정 전 게시물 내용 받아오기 -->
+                        <label class="inline fw-bold pr-auto" name="title">수정 전 게시물</label>
+                        <div id="markdown-editor" style="overflow:scroll;width:70vw;">{{ content|safe }}</div>
+                    </div>
+                    <div class="inline">
+                        <!-- 수정 후 게시물 내용 받아오기 -->
+                        <label class="inline fw-bold pr-auto" name="title">수정 후 게시물</label>
+                        <div id="markdown-editor" style="overflow:scroll;width:70vw;">{{ content|safe }}</div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="flex items-center justify-center my-4">
+                <form onsubmit="addLike(event, '{{ post['_id'] }}')"
+                    class="w-40 py-2 px-4 mr-6 bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90 text-center">
+                    <button type="submit" id="approve">
+                        승인{{approve_num}}
+                    </button>
+                </form>
+
+                <form onsubmit="redirectToEdit(event, '{{ post['_id'] }}')"
+                    class="w-40 py-2 px-4 bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90 text-center">
+                    <button type="submit" id="deny">
+                        비승인{{deny_num}}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- SimpleMDE JS -->
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function () {
+            const token = sessionStorage.getItem('access_token');
+            if (!token) {
+                alert('ERROR')
+                window.location.href = '/login';
+            }
+
+            getUserData();
+
+            const response = await fetch('/verification', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+            } else {
+                localStorage.removeItem('access_token');
+                window.location.href = '{{ url_for("login") }}';
+            }
+        });
+
+        function getUserData() {
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert('Access token is missing!');
+                return;
+            }
+
+            $.ajax({
+                url: '/getUserData',
+                type: 'GET',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                success: function (response) {
+                    document.getElementById('userRealname').innerText = "이름 : " + response.userRealname;
+                    document.getElementById('userNickname').innerText = "닉네임 : " + response.userNickname;
+                    document.getElementById('userWrittenNum').innerText = "작성글 수 : " + response.userWrittenNum;
+                },
+                error: function (error) {
+
+                }
+            });
+        }
+
+        function redirectToEdit(event, postId) {
+            event.preventDefault();
+            window.location.href = `/wiki/e/${postId}`;
+        }
+
+        function addLike(event, postId) {
+
+            event.preventDefault();  // 기본 동작 막기
+
+
+
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert('Access token is missing!');
+                return;
+            }
+
+            $.ajax({
+                url: '/wiki/like',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                data: JSON.stringify({ id_give: postId }),
+                success: function (response) {
+                    if (response.result === 'success') {
+                        alert('Like added successfully!');
+                        location.reload();
+                    } else {
+                        alert('Failed to add like.');
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+
+        async function submitForm(event) {
+            event.preventDefault();
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert('Access token is missing!');
+                return;
+            }
+
+            const response = await fetch('/write', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                }
+            });
+
+
+            if (response.ok) {
+                const result = await response.json();
+                // 서버가 리디렉션 URL을 응답으로 보낼 경우
+                if (result.redirect_url) {
+                    window.location.href = result.redirect_url;
+                }
+            } else {
+                console.error('Error:', response.statusText);
+            }
+        }
+
+
+    </script>
+    <!-- 부트스트랩 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
