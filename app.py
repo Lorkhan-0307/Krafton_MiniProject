@@ -269,7 +269,7 @@ def edit_page(id):
     theme = post['theme']
     cnt = documents.count_documents({})
 
-    return render_template('edit.html', post=post, content=content
+    return render_template('edit_write.html', post=post, content=content
                            ,create_at=created_at,recommended=recommended,theme=theme,cnt=cnt)
 
 @app.route('/wiki/re/<id>', methods=['GET'])
@@ -281,7 +281,7 @@ def readedit_page(id):
     theme = post['theme']
     cnt = documents.count_documents({})
 
-    return render_template('readedit.html', post=post, content=content,
+    return render_template('readedit.html', themesList=themesList, post=post, content=content,
                            create_at=created_at, recommended=recommended, theme=theme, cnt=cnt)
 
 @app.route('/wiki/like', methods=['POST'])
