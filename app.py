@@ -13,6 +13,19 @@ app.config['SECRET_KEY'] = 'super-secret'
 app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
 app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)
 
+
+themesList = [
+    ("ProgrammingLanguage", "프로그래밍 언어"),
+    ("DataStructure", "자료구조"),
+    ("Algorithm", "알고리즘"),
+    ("OperatingSystem", "운영체제"),
+    ("ComputerArchitecture", "컴퓨터구조"),
+    ("Database", "데이터베이스"),
+    ("LogicCircuit", "논리회로"),
+    ("ComputerNetwork", "컴퓨터 네트워크"),
+    ("Others", "기타")
+]
+
 mongo = PyMongo(app)
 jwt = JWTManager(app)
 
@@ -60,7 +73,7 @@ def wiki_page():
     documents_week2_date = list(mongo.db.documents.find({'theme':'week2'}).sort({'created_at':-1}))
     documents_week2_like = list(mongo.db.documents.find({'theme':'week2'}).sort({'likes':-1}))
 
-    return render_template('wiki.html',
+    return render_template('wiki.html', themesList=themesList,
     documents_all_date=documents_all_date, documents_all_like=documents_all_like,
     documents_week0_date=documents_week0_date,documents_week0_like=documents_week0_like,
     documents_week1_date=documents_week1_date, documents_week1_like=documents_week1_like,
@@ -102,7 +115,7 @@ def signup():
 
 @app.route('/write_page', methods=['GET'])
 def write_page():
-    return render_template('write.html')
+    return render_template('write.html', themesList=themesList)
 
 @app.route('/write', methods=['POST'])
 @jwt_required()
@@ -225,7 +238,6 @@ def save():
         Client받기 : Title, Theme, Content, Writer, isEditable
         생성하기: created at or updated at
         DB받기 : approved_at, isUpdated
-        
         '''
         return jsonify({"message": "Data saved successfully!"}), 200
     except Exception as e:

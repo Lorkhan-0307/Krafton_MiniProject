@@ -146,16 +146,15 @@ lastModifiedTime]]
                         </label>
                     </li>
                     <!-- TODO : 진자2
-                    반복문을 사용하여 각 테마를 들고옴.
-
-                    {% for ml in myList %} 
+                    반복문을 사용하여 각 테마를 들고옴. -->
+                    {% for theme in themesList %} 
                     <li>
                         <a href="#"
                             class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group">
-                            <span class="flex-1 ms-3 whitespace-nowrap">{{ theme }}</span> : 테마
+                            <span class="flex-1 ms-3 whitespace-nowrap">{{ theme[1] }}</span>
                         </a>
                     </li>
-                    {% endfor %} -->
+                    {% endfor %}
                 </ul>
             </div>
         </aside>
