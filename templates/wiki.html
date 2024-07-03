@@ -1,3 +1,4 @@
+
 <!-- templates/wiki.html -->
 
 <!-- Jinja를 통해 받아야 하는 변수 목록 및 순서
@@ -5,8 +6,6 @@
 theme
 userRealname
 userWrittenNum
-
-이 부분은 취소...
 
 최신 게시물
 [[title
@@ -75,6 +74,7 @@ lastModifiedTime]]
             console.error('Error:', response.statusText);
         }
     }
+
     function getUserData(){
         const accessToken = sessionStorage.getItem('access_token');
             if (!accessToken) {
@@ -114,6 +114,7 @@ lastModifiedTime]]
 </head>
 
 <body>
+    {{ documents_all_like[0] }}
     <div class="min-h-full">
         <nav class="bg-gray-800 py-3">
             <div class="flex h-16 items-center justify-between">

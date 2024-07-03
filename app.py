@@ -4,6 +4,7 @@ from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_req
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 from flask_jwt_extended.exceptions import NoAuthorizationError
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/mydatabase'  # MongoDB URI 설정
@@ -28,6 +29,7 @@ def login():
     if not user or not check_password_hash(user['password'], data['password']):
         return jsonify({'message': 'Invalid credentials'}), 401
 
+
     access_token = create_access_token(identity={'userId': user['userId'], 'userRealName': user['userrealname'], 'userNickName': user['usernickname']})
     return jsonify(access_token=access_token), 200
 
@@ -39,9 +41,30 @@ def signup_page():
 def redirection_page():
     return render_template('redirection.html')
 
+# wiki.html로 db 올리기.
 @app.route('/wiki', methods=['GET'])
 def wiki_page():
-    return render_template('wiki.html') 
+    documents_all_date = list(mongo.db.documents.find({}).sort('created_at', -1))
+    documents_all_like = list(mongo.db.documents.find({}).sort('likes', -1))
+
+        # week0의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_week0_date = list(mongo.db.documents.find({'theme':'week0'}).sort({'created_at':-1}))
+    documents_week0_like = list(mongo.db.documents.find({'theme':'week0'}).sort({'likes':-1}))
+
+        # week01의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_week1_date = list(mongo.db.documents.find({'theme':'week1'}).sort({'created_at':-1}))
+    documents_week1_like = list(mongo.db.documents.find({'theme':'week1'}).sort({'likes':-1}))
+
+        # week2의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_week2_date = list(mongo.db.documents.find({'theme':'week2'}).sort({'created_at':-1}))
+    documents_week2_like = list(mongo.db.documents.find({'theme':'week2'}).sort({'likes':-1}))
+
+    return render_template('wiki.html',
+    documents_all_date=documents_all_date, documents_all_like=documents_all_like,
+    documents_week0_date=documents_week0_date,documents_week0_like=documents_week0_like,
+    documents_week1_date=documents_week1_date, documents_week1_like=documents_week1_like,
+    documents_week2_date=documents_week2_date, documents_like=documents_week2_like
+    ) 
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -183,5 +206,57 @@ def save():
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
+
+
+# 특정 게시물의 ID값을 받아 내용을 전달.
+@app.route('/wiki/read', methods=['GET'])
+def read_articles():
+    data = request.args
+    id_receive = data['id_give']
+
+    id_receive = request.args.get('id_give')
+    try:
+        # ObjectId로 변환
+        article_id = ObjectId(id_receive)
+    except:
+        return "Invalid ID format", 400
+    
+    article = mongo.db.documents.find_one({'_id':article_id})
+
+    return render_template('wiki/r.html', article=article)
+
+@app.route('/wiki/like', methods=['POST'])
+def like_article():
+    #클라이언트로부터 _id 받기.
+    id_receive = request.form['id_give']
+    article_id = ObjectId(id_receive)
+
+    article = mongo.db.documents.find_one({'_id':article_id})
+    
+    #받은 id에 해당하는 like +1
+    new_like = article['likes'] + 1
+    
+    #몽고db에 업데이트
+    mongo.db.documents.update_one({'_id': article_id}, {'$set': {'likes': new_like}})
+
+    return jsonify({'result': 'success', 'msg': 'success'})
+
+#랜덤 게시물은 나중에 추가.
+# @app.route('/wiki/random', methods=['GET'])
+# def random_articles():
+#     articles = list(mongo.db.documents.find({}))
+#     ranNum = random.randrange(0,len(articles) - 1)
+#     article = articles[ranNum]
+
+#     return render_template('wiki/r.html', article = article)
+
+#  겹치는 타이틀이 있는지 없는지.
+@app.route('/wiki/w', methods=['GET'])
+def write_new_title():
+    title_receive = request.args['title_give']
+    if mongo.db.documents.count_documents({'Title': title_receive}, limit=1) > 0:
+        return jsonify({'message': '타이틀이 이미 존재합니다. 다른 타이틀을 골라주세요.','result' : 'fail'}), 403
+    
+    return jsonify({'message': '타이틀이 유효합니다.', 'result': 'success'}), 200
 if __name__ == '__main__':
     app.run(debug=True)
