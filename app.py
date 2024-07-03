@@ -2,9 +2,10 @@ from flask import Flask, jsonify, request, render_template, redirect, url_for
 from flask_pymongo import PyMongo
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt, jwt_required, get_jwt_identity, verify_jwt_in_request
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
 from flask_jwt_extended.exceptions import NoAuthorizationError
 from bson.objectid import ObjectId
+from datetime import datetime as dt
+import datetime
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/mydatabase'  # MongoDB URI 설정
@@ -14,6 +15,7 @@ app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(minutes=30)
 
 mongo = PyMongo(app)
 jwt = JWTManager(app)
+
 
 documents = mongo.db.documents
 
@@ -44,26 +46,61 @@ def redirection_page():
 # wiki.html로 db 올리기.
 @app.route('/wiki', methods=['GET'])
 def wiki_page():
-    documents_all_date = list(mongo.db.documents.find({}).sort('created_at', -1))
-    documents_all_like = list(mongo.db.documents.find({}).sort('likes', -1))
+        # ProgrammingLanguage의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_ProgrammingLanguage_date = list(mongo.db.documents.find({'theme':'ProgrammingLanguage'}).sort('created_at', -1))
+    documents_ProgrammingLanguage_like = list(mongo.db.documents.find({'theme':'ProgrammingLanguage'}).sort('recommended', -1))
 
-        # week0의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_week0_date = list(mongo.db.documents.find({'theme':'week0'}).sort({'created_at':-1}))
-    documents_week0_like = list(mongo.db.documents.find({'theme':'week0'}).sort({'likes':-1}))
+        # DataStructure의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_DataStructure_date = list(mongo.db.documents.find({'theme':'DataStructure'}).sort('created_at', -1))
+    documents_DataStructure_like = list(mongo.db.documents.find({'theme':'DataStructure'}).sort('recommended', -1))
 
-        # week01의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_week1_date = list(mongo.db.documents.find({'theme':'week1'}).sort({'created_at':-1}))
-    documents_week1_like = list(mongo.db.documents.find({'theme':'week1'}).sort({'likes':-1}))
+        # Algorhythm의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_Algorhythm_date = list(mongo.db.documents.find({'theme':'Algorhythm'}).sort('created_at', -1))
+    documents_Algorhythm_like = list(mongo.db.documents.find({'theme':'Algorhythm'}).sort('recommended', -1))
 
-        # week2의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_week2_date = list(mongo.db.documents.find({'theme':'week2'}).sort({'created_at':-1}))
-    documents_week2_like = list(mongo.db.documents.find({'theme':'week2'}).sort({'likes':-1}))
+        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_OperatingSystem_date = list(mongo.db.documents.find({'theme':'OperatingSystem'}).sort('created_at', -1))
+    documents_OperatingSystem_like = list(mongo.db.documents.find({'theme':'OperatingSystem'}).sort('recommended', -1))
+    
+        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_Computerarchitecture_date = list(mongo.db.documents.find({'theme':'Computerarchitecture'}).sort('created_at', -1))
+    documents_Computerarchitecture_like = list(mongo.db.documents.find({'theme':'Computerarchitecture'}).sort('recommended', -1))
+
+        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_Database_date = list(mongo.db.documents.find({'theme':'Database'}).sort('created_at', -1))
+    documents_Database_like = list(mongo.db.documents.find({'theme':'Database'}).sort('recommended', -1))
+
+        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_LogitCircuit_date = list(mongo.db.documents.find({'theme':'LogitCircuit'}).sort('created_at', -1))
+    documents_LogitCircuit_like = list(mongo.db.documents.find({'theme':'LogitCircuit'}).sort('recommended', -1))
+
+        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_ComputerNetwork_date = list(mongo.db.documents.find({'theme':'ComputerNetwork'}).sort('created_at', -1))
+    documents_ComputerNetwork_like = list(mongo.db.documents.find({'theme':'ComputerNetwork'}).sort('recommended', -1))
+
+        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
+    documents_Others_date = list(mongo.db.documents.find({'theme':'Others'}).sort('created_at', -1))
+    documents_Others_like = list(mongo.db.documents.find({'theme':'Others'}).sort('recommended', -1))
 
     return render_template('wiki.html',
-    documents_all_date=documents_all_date, documents_all_like=documents_all_like,
-    documents_week0_date=documents_week0_date,documents_week0_like=documents_week0_like,
-    documents_week1_date=documents_week1_date, documents_week1_like=documents_week1_like,
-    documents_week2_date=documents_week2_date, documents_like=documents_week2_like
+                            documents_ProgrammingLanguage_date=documents_ProgrammingLanguage_date,
+                            documents_ProgrammingLanguage_like=documents_ProgrammingLanguage_like,
+                            documents_DataStructure_date=documents_DataStructure_date,
+                            documents_DataStructure_like=documents_DataStructure_like,
+                            documents_Algorhythm_date=documents_Algorhythm_date,
+                            documents_Algorhythm_like=documents_Algorhythm_like,
+                            documents_OperatingSystem_date=documents_OperatingSystem_date, 
+                            documents_OperatingSystem_like=documents_OperatingSystem_like,
+                            documents_Computerarchitecture_date=documents_Computerarchitecture_date,
+                            documents_Computerarchitecture_like=documents_Computerarchitecture_like,
+                            documents_Database_date=documents_Database_date,
+                            documents_Database_like=documents_Database_like,
+                            documents_LogitCircuit_date=documents_LogitCircuit_date,
+                            documents_LogitCircuit_like=documents_LogitCircuit_like,
+                            documents_ComputerNetwork_date=documents_ComputerNetwork_date,
+                            documents_ComputerNetwork_like=documents_ComputerNetwork_like,
+                            documents_Others_date=documents_Others_date,
+                            documents_Others_like=documents_Others_like
     ) 
 
 @app.route('/signup', methods=['POST'])
@@ -88,6 +125,8 @@ def signup():
     user_collection = mongo.db.users
     if user_collection.find_one({'userId': data['userId']}):
         return jsonify({'message': 'User already exists'}), 400
+    if user_collection.find_one({'userNickName': data['nickname']}):
+        return jsonify({'message': 'User Nickname already exists'}), 400
     
     # Todo : 사용자 검증 들어가야함
 
@@ -120,8 +159,8 @@ def wiki():
         verify_jwt_in_request()
         current_user = get_jwt_identity()
         
-        userId = current_user['userId']
-        return jsonify(logged_in_as=userId)
+        userNickName = current_user['userNickName']
+        return jsonify(logged_in_as=userNickName)
     
     except NoAuthorizationError:
         return redirect(url_for('login_page'))
@@ -133,8 +172,8 @@ def verification():
         verify_jwt_in_request()
         current_user = get_jwt_identity()
         
-        userId = current_user['userId']
-        return jsonify(logged_in_as=userId)
+        userNickName = current_user['userNickName']
+        return jsonify(logged_in_as=userNickName)
     
     except NoAuthorizationError:
         return redirect(url_for('login_page'))
@@ -148,24 +187,47 @@ def getWrittenNum(userNickname):
 def get_user_data():
     claims = get_jwt()
     user_info = claims['sub']
-    user_real_name = user_info.get('userRealName')
-    user_nick_name = user_info.get('userNickName')
     userRealname = user_info.get('userRealName')
     print(userRealname)
     userNickname = user_info.get('userNickName')
     userWrittenNum = documents.count_documents({'writer': userNickname})
+    print(userNickname)
+    print(documents.count_documents({'writer': userNickname}))
+    print(documents.count_documents({'writer': 'JinJaewoong11'}))
     return jsonify(userRealname=userRealname, userNickname=userNickname, userWrittenNum = userWrittenNum)
 
 
 @app.route('/save', methods=['POST'])
+@jwt_required()
 def save():
     try:
         verify_jwt_in_request()
         data = request.get_json()
         title = data['title']
-        tag = data['tag']
         writer = data['writer']
         content = data['content']
+        theme = data['theme']
+        isEditable = data['isEditable']
+
+         # 현재 시간 설정
+        try:
+            now_dt = dt.now()
+            print("Current time (datetime):", now_dt)
+        except Exception as e:
+            print("Error getting current time:", str(e))
+            return jsonify({"error": "Error getting current time"}), 500
+        
+
+        # 마이크로초 생략하고 포맷 지정
+        formatted_now = now_dt.strftime('%Y-%m-%d %H:%M:%S')
+        print("Formatted current time:", formatted_now)
+
+        created_at = formatted_now
+        approved_at = formatted_now
+        updated_at = formatted_now
+
+        isUpdated = False
+        recommended = 0
 
         '''
         #### TextList
@@ -183,10 +245,15 @@ def save():
 
         document = {
             'title': title,
-            'tag': tag,
             'writer': writer,
             'content': content,
-            'created_at': datetime.utcnow()  # 저장 시간을 추가
+            'isEditable': isEditable,
+            'theme': theme,
+            'created_at': created_at,
+            'approved_at': approved_at,
+            'updated_at': updated_at,
+            'isUpdated': isUpdated,
+            'recommended': recommended
         }
         documents.insert_one(document)
 
@@ -198,10 +265,6 @@ def save():
         '''
 
         
-        
-        # 여기서 데이터를 데이터베이스에 저장하거나 다른 작업을 수행합니다.
-        print(f"Title: {title}, Tag: {tag}, Writer: {writer}, Content: {content}")
-        
         return jsonify({"message": "Data saved successfully!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
@@ -209,21 +272,27 @@ def save():
 
 
 # 특정 게시물의 ID값을 받아 내용을 전달.
-@app.route('/wiki/read', methods=['GET'])
-def read_articles():
-    data = request.args
-    id_receive = data['id_give']
+@app.route('/wiki/r/<id>', methods=['GET'])
+def view_post(id):
+    # post = documents.find_one({'title':title})
+    # if not post:
+    #     return jsonify({"msg": "Post not found"}), 404
+    # new_title = post['title'].split('_')[0]
+    # create_at = post['create_at']
+    # likes = post['likes']
+    # theme = post['theme']
+    # content = post['content']
 
-    id_receive = request.args.get('id_give')
-    try:
-        # ObjectId로 변환
-        article_id = ObjectId(id_receive)
-    except:
-        return "Invalid ID format", 400
-    
-    article = mongo.db.documents.find_one({'_id':article_id})
+    # return render_template('post.html', post=post, new_title=new_title,
+    #                        create_at=create_at,likes=likes,theme=theme,content=content)
+    post = documents.find_one({'_id': ObjectId(id)})
+    created_at = post['created_at']
+    recommended = post['recommended']
+    theme = post['theme']
+    cnt = documents.count_documents({})
 
-    return render_template('wiki/r.html', article=article)
+    return render_template('post.html', post=post,
+                           create_at=created_at,recommended=recommended,theme=theme,cnt=cnt)
 
 @app.route('/wiki/like', methods=['POST'])
 def like_article():
