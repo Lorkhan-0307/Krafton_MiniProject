@@ -15,6 +15,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
         crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="../../static/readStyle.css">
     <style>
         .form-group {
             margin-bottom: 15px;
@@ -109,14 +110,14 @@
                         오른쪽 프로필 네비게이션 부분-->
 
                         <label class="block">
-                            <span class="ms-3">이름 : {{ userRealname }}</span> <!--: 현재 로그인 된 계정의 본명-->
+                            <span class="ms-3" id="userRealname">이름 : </span> <!--: 현재 로그인 된 계정의 본명-->
                         </label>
                         <label class="block">
-                            <span class="ms-3">닉네임 : {{ userNickname }}</span> <!--: 현재 로그인 된 계정의 닉네임-->
+                            <span class="ms-3" id="userNickname">닉네임 :</span> <!--: 현재 로그인 된 계정의 닉네임-->
                         </label>
                         <label class="block">
-                            <span class="ms-3">작성글 수 : {{ userWrittenNum }}</span> <!--: 현재 로그인 된 계정의 작성글 수-->
-                        </label>
+                            <span class="ms-3" id="userWrittenNum">작성글 수 : </span> <!--: 현재 로그인 된 계정의 작성글 수-->
+                        </label> 
                     </div>
                 </div>
             </div>
@@ -125,29 +126,29 @@
         <div class="items-center p-4 sm:mx-64">
             <div class="flex form-group">
                 <!-- TODO : writer, approved_at, likeNum 서버에서 받아오기 -->
-                <label id="writer" class="inline mr-auto">{{writer}}</label>
+                <label id="writer" class="inline mr-auto">{{ post['writer'] }}</label>
                 <div class="inline mr-auto items-center text-center">
                     <label id="approved_at" class="text-xs">최근 승인 날짜</label>
-                    <label id="approved_at" class="text-xs">{{date}}</label>
+                    <label id="approved_at" class="text-xs">{{ post['approved_at'] }}</label>
 
                 </div>
-                <label id="like" class="inline">좋아요 : {{like}}</label>
+                <label id="like" class="inline">좋아요 : {{post['recommended']}}</label>
             </div>
             <div class="flex form-group items-center justify-between">
                 <!-- theme 받아오기 -->
-                <label class="" type="text" id="theme" name="theme">{{theme}}</label>
+                <label class="" type="text" id="theme" name="theme">{{post['theme']}}</label>
                 <div>
-                    <label class="text-xs" type="text" id="updated_at" name="updated_at">최종 수정 날짜 : {{updated_at}}</label>
-                    <label class="text-xs" type="text" id="created_at" name="created_at">최초 작성 날짜 : {{created_at}}</label>
+                    <label class="text-xs" type="text" id="updated_at" name="updated_at">최종 수정 날짜 : {{post['updated_at']}}</label>
+                    <label class="text-xs" type="text" id="created_at" name="created_at">최초 작성 날짜 : {{post['created_at']}}</label>
                 </div>
             </div>
             <div class="form-group items-center justify-between">
                 <!-- title 받아오기 -->
-                <label class="border-2" type="text" id="title" name="title">{{title}}</label>
+                <label class="border-2" type="text" id="title" name="title">{{post['title']}}</label>
             </div>
             <div class="form-group items-center justify-between">
                 <!-- 게시물 내용 받아오기 -->
-                <textarea class="border-2" id="markdown-editor" disabled>{{content}}</textarea>
+                <div class="border-2" id="markdown-editor" disabled>{{ content|safe }}</div>
             </div>
             <div class="flex">
                 <button type="submit" id="like-btn"
@@ -179,6 +180,8 @@
                 window.location.href = '/login';
             }
 
+            getUserData();
+
             const response = await fetch('/verification', {
                 method: 'GET',
                 headers: {
@@ -188,47 +191,37 @@
 
             if (response.ok) {
                 const data = await response.json();
-                document.getElementById('writer').innerText = `${data.logged_in_as}`;
             } else {
                 localStorage.removeItem('access_token');
                 window.location.href = '{{ url_for("login") }}';
             }
         });
-        
-        document.getElementById('submit-btn').addEventListener('click', function () {
-            const title = document.getElementById('title').value;
-            const tag = document.getElementById('tag').value;
-            const writer = document.getElementById('writer').innerText;
-            const content = simplemde.value();
 
-            if (!title || !tag || !writer || !content) {
-                alert('All fields must be filled out');
-                return;
-            }
-
-            const token = sessionStorage.getItem('access_token');
+        function getUserData(){
+            const accessToken = sessionStorage.getItem('access_token');
+                if (!accessToken) {
+                    alert('Access token is missing!');
+                    return;
+                }
 
             $.ajax({
-                url: '/save',
-                method: 'POST',
+                url: '/getUserData',
+                type: 'GET',
                 contentType: 'application/json',
                 headers: {
-                    'Authorization': 'Bearer ' + token,
+                    'Authorization': 'Bearer ' + accessToken
                 },
-                data: JSON.stringify({
-                    title: title,
-                    tag: tag,
-                    writer: writer,
-                    content: content,
-                }),
-                success: function (response) {
-                    alert('Data saved successfully!');
+                success: function(response){
+                    document.getElementById('userRealname').innerText = "이름 : " + response.userRealname;
+                    document.getElementById('userNickname').innerText = "닉네임 : " + response.userNickname;
+                    document.getElementById('userWrittenNum').innerText = "작성글 수 : " + response.userWrittenNum;
                 },
-                error: function (error) {
-                    alert('Error saving data');
+                error: function(error){
+
                 }
-            });
-        });
+            }); 
+        }
+        
     </script>
     <!-- 부트스트랩 -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

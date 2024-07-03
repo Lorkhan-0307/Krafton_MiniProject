@@ -6,6 +6,7 @@ from flask_jwt_extended.exceptions import NoAuthorizationError
 from bson.objectid import ObjectId
 from datetime import datetime as dt
 import datetime
+import markdown
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/mydatabase'  # MongoDB URI 설정
@@ -56,66 +57,20 @@ def signup_page():
 def redirection_page():
     return render_template('redirection.html')
 
+@app.route('/wiki/<theme>', methods=['GET'])
+def wiki_redirect(theme):
+    documents_theme_date = documents.find({'theme':theme}).sort('created_at', -1).limit(5)
+    documents_theme_like = documents.find({'theme':theme}).sort('recommended', -1).limit(5)
+    return render_template('wiki.html',themesList=themesList, documents_theme_date=documents_theme_date, documents_theme_like=documents_theme_like)
+
 # wiki.html로 db 올리기.
 @app.route('/wiki', methods=['GET'])
 def wiki_page():
-        # ProgrammingLanguage의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_ProgrammingLanguage_date = list(mongo.db.documents.find({'theme':'ProgrammingLanguage'}).sort('created_at', -1))
-    documents_ProgrammingLanguage_like = list(mongo.db.documents.find({'theme':'ProgrammingLanguage'}).sort('recommended', -1))
-
-        # DataStructure의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_DataStructure_date = list(mongo.db.documents.find({'theme':'DataStructure'}).sort('created_at', -1))
-    documents_DataStructure_like = list(mongo.db.documents.find({'theme':'DataStructure'}).sort('recommended', -1))
-
-        # Algorhythm의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_Algorhythm_date = list(mongo.db.documents.find({'theme':'Algorhythm'}).sort('created_at', -1))
-    documents_Algorhythm_like = list(mongo.db.documents.find({'theme':'Algorhythm'}).sort('recommended', -1))
-
-        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_OperatingSystem_date = list(mongo.db.documents.find({'theme':'OperatingSystem'}).sort('created_at', -1))
-    documents_OperatingSystem_like = list(mongo.db.documents.find({'theme':'OperatingSystem'}).sort('recommended', -1))
     
-        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_Computerarchitecture_date = list(mongo.db.documents.find({'theme':'Computerarchitecture'}).sort('created_at', -1))
-    documents_Computerarchitecture_like = list(mongo.db.documents.find({'theme':'Computerarchitecture'}).sort('recommended', -1))
+    documents_theme_date = documents.find().sort('created_at', -1).limit(5)
+    documents_theme_like = documents.find().sort('recommended', -1).limit(5)
 
-        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_Database_date = list(mongo.db.documents.find({'theme':'Database'}).sort('created_at', -1))
-    documents_Database_like = list(mongo.db.documents.find({'theme':'Database'}).sort('recommended', -1))
-
-        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_LogitCircuit_date = list(mongo.db.documents.find({'theme':'LogitCircuit'}).sort('created_at', -1))
-    documents_LogitCircuit_like = list(mongo.db.documents.find({'theme':'LogitCircuit'}).sort('recommended', -1))
-
-        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_ComputerNetwork_date = list(mongo.db.documents.find({'theme':'ComputerNetwork'}).sort('created_at', -1))
-    documents_ComputerNetwork_like = list(mongo.db.documents.find({'theme':'ComputerNetwork'}).sort('recommended', -1))
-
-        # 의 날짜,좋아요 순으로 정렬해서 table로 보냄
-    documents_Others_date = list(mongo.db.documents.find({'theme':'Others'}).sort('created_at', -1))
-    documents_Others_like = list(mongo.db.documents.find({'theme':'Others'}).sort('recommended', -1))
-
-
-    return render_template('wiki.html',  themesList=themesList,
-                            documents_ProgrammingLanguage_date=documents_ProgrammingLanguage_date,
-                            documents_ProgrammingLanguage_like=documents_ProgrammingLanguage_like,
-                            documents_DataStructure_date=documents_DataStructure_date,
-                            documents_DataStructure_like=documents_DataStructure_like,
-                            documents_Algorhythm_date=documents_Algorhythm_date,
-                            documents_Algorhythm_like=documents_Algorhythm_like,
-                            documents_OperatingSystem_date=documents_OperatingSystem_date, 
-                            documents_OperatingSystem_like=documents_OperatingSystem_like,
-                            documents_Computerarchitecture_date=documents_Computerarchitecture_date,
-                            documents_Computerarchitecture_like=documents_Computerarchitecture_like,
-                            documents_Database_date=documents_Database_date,
-                            documents_Database_like=documents_Database_like,
-                            documents_LogitCircuit_date=documents_LogitCircuit_date,
-                            documents_LogitCircuit_like=documents_LogitCircuit_like,
-                            documents_ComputerNetwork_date=documents_ComputerNetwork_date,
-                            documents_ComputerNetwork_like=documents_ComputerNetwork_like,
-                            documents_Others_date=documents_Others_date,
-                            documents_Others_like=documents_Others_like
-    ) 
+    return render_template('wiki.html',  themesList=themesList,documents_theme_date=documents_theme_date, documents_theme_like=documents_theme_like)
 
 @app.route('/signup', methods=['POST'])
 def signup():
@@ -286,25 +241,15 @@ def save():
 # 특정 게시물의 ID값을 받아 내용을 전달.
 @app.route('/wiki/r/<id>', methods=['GET'])
 def view_post(id):
-    # post = documents.find_one({'title':title})
-    # if not post:
-    #     return jsonify({"msg": "Post not found"}), 404
-    # new_title = post['title'].split('_')[0]
-    # create_at = post['create_at']
-    # likes = post['likes']
-    # theme = post['theme']
-    # content = post['content']
-
-    # return render_template('post.html', post=post, new_title=new_title,
-    #                        create_at=create_at,likes=likes,theme=theme,content=content)
     post = documents.find_one({'_id': ObjectId(id)})
+    content = markdown.markdown(post['content'])
     created_at = post['created_at']
     recommended = post['recommended']
     theme = post['theme']
     cnt = documents.count_documents({})
 
-    return render_template('post.html', post=post,
-                           create_at=created_at,recommended=recommended,theme=theme,cnt=cnt)
+    return render_template('read.html', post=post, content=content
+                           ,create_at=created_at,recommended=recommended,theme=theme,cnt=cnt)
 
 @app.route('/wiki/like', methods=['POST'])
 def like_article():

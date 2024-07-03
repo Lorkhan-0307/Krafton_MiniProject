@@ -118,7 +118,7 @@ lastModifiedTime]]
         <nav class="bg-gray-800 py-3">
             <div class="flex h-16 items-center justify-between">
                 <div class="flex items-center">
-                    <a href="#" class="text-2xl text-white mx-4 px-3">TerraWiki</a>
+                    <a href="/wiki" class="text-2xl text-white mx-4 px-3">TerraWiki</a>
                     <a href="#"
                         class="text-center rounded-md bg-gray-900 ml-20 px-4 py-2 text-base font-medium text-white hover:bg-slate-600"
                         aria-current="page">랜덤 게시물 이동</a>
@@ -148,7 +148,7 @@ lastModifiedTime]]
                     반복문을 사용하여 각 테마를 들고옴. -->
                     {% for theme in themesList %} 
                     <li>
-                        <a href="#"
+                        <a href="/wiki/{{theme[0]}}"
                             class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group">
                             <span class="flex-1 ms-3 whitespace-nowrap">{{ theme[1] }}</span>
                         </a>
@@ -198,6 +198,15 @@ lastModifiedTime]]
                     </tr>
                 </thead>
                 <tbody>
+                    {% for documents in documents_theme_date %}
+                    <tr>
+                        <th scope="row" colspan="3">
+                            <a href="/wiki/r/{{documents['_id']}}" class="hover:text-blue-400 hover:cursor-pointer">{{ documents['title'] }}</span>
+                        </th>
+                        <td>{{ documents['writer'] }}</td>
+                        <td>{{ documents['approved_at'] }}</td>
+                    </tr>
+                    {% endfor %}
                     <!-- TODO : 진자2
                     중앙 메인 윗부분 최신순으로 게시물 정보 받아오기
 
