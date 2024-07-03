@@ -7,6 +7,7 @@ from bson.objectid import ObjectId
 from datetime import datetime as dt
 import datetime
 import markdown
+import math
 
 app = Flask(__name__)
 app.config['MONGO_URI'] = 'mongodb://localhost:27017/mydatabase'  # MongoDB URI 설정
@@ -284,5 +285,38 @@ def write_new_title():
         return jsonify({'message': '타이틀이 이미 존재합니다. 다른 타이틀을 골라주세요.','result' : 'fail'}), 403
     
     return jsonify({'message': '타이틀이 유효합니다.', 'result': 'success'}), 200
+
+@app.route('/get_documents', methods=['GET'])
+def get_documents():
+    try:
+        page = int(request.args.get('page', 1))
+        limit = int(request.args.get('limit', 5))
+        theme = request.args.get('theme', '')
+        method = request.args.get('method', '')
+
+        documents = mongo.db.documents
+        query = {'theme': theme} if theme else {}
+
+        total_documents = documents.count_documents(query)
+        total_pages = math.ceil(total_documents / limit)
+
+        if method == 'recommended':
+            sort_field = 'recommended'
+        else:
+            sort_field = 'approved_at'
+
+        documents_theme_date = list(documents.find(query).sort(sort_field, -1).skip((page - 1) * limit).limit(limit))
+
+        # Convert ObjectId to string for JSON serialization
+        for doc in documents_theme_date:
+            doc['_id'] = str(doc['_id'])
+
+        return jsonify({
+            'documents': documents_theme_date,
+            'total_pages': total_pages,
+            'current_page': page
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True)

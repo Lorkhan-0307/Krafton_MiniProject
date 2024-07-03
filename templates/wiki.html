@@ -1,32 +1,10 @@
-
-<!-- templates/wiki.html -->
-
-<!-- Jinja를 통해 받아야 하는 변수 목록 및 순서
- 
-theme
-userRealname
-userWrittenNum
-
-최신 게시물
-[[title
-writer
-lastModifiedTime]]
-
-인기 게시물
-[[title
-writer
-lastModifiedTime]]
-
--->
-
-
 <!doctype html>
 <html lang="en">
 <script>
     document.addEventListener('DOMContentLoaded', async function () {
         const token = sessionStorage.getItem('access_token');
         if (!token) {
-            alert('ERROR')
+            alert('ERROR');
             window.location.href = '/login';
         }
 
@@ -41,7 +19,8 @@ lastModifiedTime]]
 
         if (response.ok) {
             const data = await response.json();
-            //document.getElementById('welcome-message').innerText = `Welcome, ${data.logged_in_as}`;
+            loadDocuments(1);
+            loadDocuments(1, theme='', method='recommended');
         } else {
             localStorage.removeItem('access_token');
             window.location.href = '{{ url_for("login") }}';
@@ -63,7 +42,6 @@ lastModifiedTime]]
             }
         });
 
-
         if (response.ok) {
             const result = await response.json();
             // 서버가 리디렉션 URL을 응답으로 보낼 경우
@@ -75,12 +53,62 @@ lastModifiedTime]]
         }
     }
 
-    function getUserData(){
+    async function loadDocuments(page, theme = '', method = 'date') {
+    try {
+        const response = await fetch(`/get_documents?page=${page}&limit=5&theme=${theme}&method=${method}`);
+        const data = await response.json();
+        
+        // Debugging: Log response data
+        console.log(data);
+
+        const documentsTable = document.querySelector(`#documents-table-${method} tbody`);
+        documentsTable.innerHTML = '';
+
+        data.documents.forEach(doc => {
+            const row = `
+                <tr>
+                    <th scope="row" colspan="3">
+                        <a href="/wiki/r/${doc._id}" class="hover:text-blue-400 hover:cursor-pointer">${doc.title}</a>
+                    </th>
+                    <td>${doc.writer}</td>
+                    <td>${doc.approved_at}</td>
+                </tr>
+            `;
+            documentsTable.insertAdjacentHTML('beforeend', row);
+        });
+
+
+        let pagination;
+        if (method === 'date') {
+            pagination = document.getElementById('pagination_date');
+        } else if (method === 'recommended') {
+            pagination = document.getElementById('pagination_recommended');
+        }
+        pagination.innerHTML = '';
+
+        for (let i = 1; i <= data.total_pages; i++) {
+            const pageItem = `
+                <li>
+                    <a href="#" onclick="loadDocuments(${i}, '${theme}', '${method}')" 
+                        class="flex items-center justify-center px-3 h-8 leading-tight ${i === page ? 'text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"' : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'} ${i === page ? 'z-10' : ''}"
+                        ${i === page ? 'aria-current="page"' : ''}>
+                        ${i}
+                    </a>
+                </li>
+            `;
+            pagination.insertAdjacentHTML('beforeend', pageItem);
+        }
+    } catch (error) {
+        console.error('Error loading documents:', error);
+    }
+}
+
+    function getUserData() {
         const accessToken = sessionStorage.getItem('access_token');
-            if (!accessToken) {
-                alert('Access token is missing!');
-                return;
-            }
+        if (!accessToken) {
+            alert('Access token is missing!');
+            return;
+        }
 
         $.ajax({
             url: '/getUserData',
@@ -144,11 +172,9 @@ lastModifiedTime]]
                             <span class="ms-3">주제</span>
                         </label>
                     </li>
-                    <!-- TODO : 진자2
-                    반복문을 사용하여 각 테마를 들고옴. -->
                     {% for theme in themesList %} 
                     <li>
-                        <a href="/wiki/{{theme[0]}}"
+                        <a href="javascript:void(0);" onclick="loadDocuments(1, '{{theme[0]}}', 'date'); loadDocuments(1, '{{theme[0]}}', 'recommended');"
                             class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-gray-200 group">
                             <span class="flex-1 ms-3 whitespace-nowrap">{{ theme[1] }}</span>
                         </a>
@@ -162,34 +188,23 @@ lastModifiedTime]]
             aria-label="Sidebar">
             <div class="h-full px-3 py-4 bg-gray-50">
                 <div>
-                    <!-- TODO : 진자2
-                    오른쪽 프로필 네비게이션 부분
-                    src 프로필 사진 가져오기 
-                    
                     <div class="inline-block">
-                        <img src="..." class="img-thumbnail">
-                    </div>-->
-                    <div class="inline-block">
-                        <!-- TODO : 진자2
-                        오른쪽 프로필 네비게이션 부분-->
-
                         <label class="block">
-                            <span class="ms-3" id="userRealname">이름 : </span> <!--: 현재 로그인 된 계정의 본명-->
+                            <span class="ms-3" id="userRealname">이름 : </span>
                         </label>
                         <label class="block">
-                            <span class="ms-3" id="userNickname">닉네임 :</span> <!--: 현재 로그인 된 계정의 닉네임-->
+                            <span class="ms-3" id="userNickname">닉네임 :</span>
                         </label>
                         <label class="block">
-                            <span class="ms-3" id="userWrittenNum">작성글 수 : </span> <!--: 현재 로그인 된 계정의 작성글 수-->
+                            <span class="ms-3" id="userWrittenNum">작성글 수 : </span>
                         </label> 
                     </div>
                 </div>
             </div>
         </aside>
         
-
         <div class="p-3 sm:mx-64">
-            <table class="table table-sm table-striped">
+            <table id="documents-table-date" class="table table-sm table-striped">
                 <thead>
                     <tr>
                         <th scope="col" colspan="3">최신순 제목</th>
@@ -198,35 +213,16 @@ lastModifiedTime]]
                     </tr>
                 </thead>
                 <tbody>
-                    {% for documents in documents_theme_date %}
-                    <tr>
-                        <th scope="row" colspan="3">
-                            <a href="/wiki/r/{{documents['_id']}}" class="hover:text-blue-400 hover:cursor-pointer">{{ documents['title'] }}</span>
-                        </th>
-                        <td>{{ documents['writer'] }}</td>
-                        <td>{{ documents['approved_at'] }}</td>
-                    </tr>
-                    {% endfor %}
-                    <!-- TODO : 진자2
-                    중앙 메인 윗부분 최신순으로 게시물 정보 받아오기
-
-                    최신순 제목, 작성자, 수정 시간 받아오기
-                    {% for ml in myList %}
-                    <tr>
-                        <th scope="row" colspan="3">
-                            onclick 구현
-                            <span onclick="" class="hover:text-blue-400 hover:cursor-pointer">{{ title }}</span> : 최신순 제목
-                        </th>
-                        <td>{{ writer }}</td> : 작성자
-                        <td>{{ lastModifiedTime }}</td> : 수정 시간
-                    </tr>
-                    {% endfor %} -->
+                    <!-- 문서 데이터가 여기 삽입됩니다 -->
                 </tbody>
             </table>
+            <ul id="pagination_date" class="flex items-center -space-x-px h-8 text-sm p-3 sm:mx-64">
+                <!-- 페이지네이션 링크가 여기에 추가됩니다. -->
+            </ul>
         </div>
 
         <div class="p-3 sm:mx-64">
-            <table class="table table-sm table-striped">
+            <table id="documents-table-recommended" class="table table-sm table-striped">
                 <thead>
                     <tr>
                         <th scope="col" colspan="3">인기순 제목</th>
@@ -235,29 +231,12 @@ lastModifiedTime]]
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- TODO : 진자2
-                    중앙 메인 아랫부분 인기순으로 게시물 정보 받아오기
-
-                    인기순 제목, 작성자, 수정 시간 받아오기
-                    {% for ml in myList %}
-                    <tr class="hover:bg-gray-300">
-                        <th scope="row" colspan="3">{{title}}</th> : 인기순 제목
-                        <td>{{ writer }}</td> : 작성자
-                        <td>{{ lastModifiedTime }}</td> : 수정 시간
-                    </tr>
-                    {% endfor %} -->
-
-                    {% for documents in documents_theme_like %}
-                    <tr>
-                        <th scope="row" colspan="3">
-                            <a href="/wiki/r/{{documents['_id']}}" class="hover:text-blue-400 hover:cursor-pointer">{{ documents['title'] }}</span>
-                        </th>
-                        <td>{{ documents['writer'] }}</td>
-                        <td>{{ documents['approved_at'] }}</td>
-                    </tr>
-                    {% endfor %}
+                    <!-- 문서 데이터가 여기 삽입됩니다 -->
                 </tbody>
             </table>
+            <ul id="pagination_recommended" class="flex items-center -space-x-px h-8 text-sm p-3 sm:mx-64">
+                <!-- 페이지네이션 링크가 여기에 추가됩니다. -->
+            </ul>
         </div>
     </div>
 
@@ -266,6 +245,4 @@ lastModifiedTime]]
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 </body>
-</body>
-
 </html>
