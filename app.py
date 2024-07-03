@@ -252,19 +252,53 @@ def view_post(id):
     return render_template('read.html', post=post, content=content
                            ,create_at=created_at,recommended=recommended,theme=theme,cnt=cnt)
 
+
+
+# 특정 게시물의 ID값을 받아 내용을 전달.
+@app.route('/wiki/e/<id>', methods=['GET'])
+def edit_page(id):
+    post = documents.find_one({'_id': ObjectId(id)})
+
+    # 만약 isEditing인가 뭔가가 참이면 edit이 아니고 readedit page로 넘어가야함.
+    if post.get('isUpdated', False):
+        return redirect(url_for('readedit_page', id=id))
+
+    content = markdown.markdown(post['content'])
+    created_at = post['created_at']
+    recommended = post['recommended']
+    theme = post['theme']
+    cnt = documents.count_documents({})
+
+    return render_template('edit.html', post=post, content=content
+                           ,create_at=created_at,recommended=recommended,theme=theme,cnt=cnt)
+
+@app.route('/wiki/re/<id>', methods=['GET'])
+def readedit_page(id):
+    post = documents.find_one({'_id': ObjectId(id)})
+    content = markdown.markdown(post['content'])
+    created_at = post['created_at']
+    recommended = post['recommended']
+    theme = post['theme']
+    cnt = documents.count_documents({})
+
+    return render_template('readedit.html', post=post, content=content,
+                           create_at=created_at, recommended=recommended, theme=theme, cnt=cnt)
+
 @app.route('/wiki/like', methods=['POST'])
+@jwt_required()
 def like_article():
+    verify_jwt_in_request()
     #클라이언트로부터 _id 받기.
-    id_receive = request.form['id_give']
-    article_id = ObjectId(id_receive)
+    data = request.get_json()  # request.form 대신 request.get_json() 사용
+    article_id = ObjectId(data['id_give'])  # JSON 데이터에서 id_give 추출
 
     article = mongo.db.documents.find_one({'_id':article_id})
     
     #받은 id에 해당하는 like +1
-    new_like = article['likes'] + 1
+    new_like = article['recommended'] + 1
     
     #몽고db에 업데이트
-    mongo.db.documents.update_one({'_id': article_id}, {'$set': {'likes': new_like}})
+    mongo.db.documents.update_one({'_id': article_id}, {'$set': {'recommended': new_like}})
 
     return jsonify({'result': 'success', 'msg': 'success'})
 

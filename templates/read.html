@@ -153,22 +153,22 @@
 
 
             <div class="flex px-8">
-                <button type="submit" id="like-btn"
-                    class="py-2 px-4 mr-auto bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90">
-                    좋아요
-                    <!-- 수정 게시물이 있을 시
-                    버튼 text를 (수정 게시물 검토)로 바꾸기 -->
-                </button>
+                <form onsubmit="addLike(event, '{{ post['_id'] }}')" class="py-2 px-4 mr-auto bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90">   
+                    <button type="submit" id="like-btn">
+                        좋아요
+                    </button>
+                </form>
 
-                <button type="submit" id="edit-btn"
-                    class="py-2 px-5 ml-auto bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90">
-                    수정
-                    <!-- 수정 게시물 존재 여부에따라 수정 버튼과 검토 버튼 구분 -->
-                    <!-- {% if 수정게시물 == False %} -->
-                    <!-- {% else %}
-                    수정 게시물 검토
-                    {% endif %} -->
-                </button>
+                <form onsubmit="redirectToEdit(event, '{{ post['_id'] }}')"class="py-2 px-5 ml-auto bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90">                    
+                    <button type="submit" id="edit-btn">
+                        수정
+                        <!-- 수정 게시물 존재 여부에따라 수정 버튼과 검토 버튼 구분 -->
+                        <!-- {% if 수정게시물 == False %} -->
+                        <!-- {% else %}
+                        수정 게시물 검토
+                        {% endif %} -->
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -224,31 +224,71 @@
                 }
             }); 
         }
-
-        async function submitForm(event) {
-        event.preventDefault();
-        const accessToken = sessionStorage.getItem('access_token');
-        if (!accessToken) {
-            alert('Access token is missing!');
-            return;
+        
+        function redirectToEdit(event, postId) {
+            event.preventDefault();
+            window.location.href = `/wiki/e/${postId}`;
         }
 
-        const response = await fetch('/write', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'Bearer ' + accessToken
+        function addLike(event, postId) {
+            
+            event.preventDefault();  // 기본 동작 막기
+
+            
+
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert('Access token is missing!');
+                return;
             }
-        });
+
+            $.ajax({
+                url: '/wiki/like',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                data: JSON.stringify({ id_give: postId }),
+                success: function(response) {
+                    if (response.result === 'success') {
+                        alert('Like added successfully!');
+                        location.reload();
+                    } else {
+                        alert('Failed to add like.');
+                    }
+                },
+                error: function(error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+        
+
+        async function submitForm(event) {
+            event.preventDefault();
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert('Access token is missing!');
+                return;
+            }
+
+            const response = await fetch('/write', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                }
+            });
 
 
-        if (response.ok) {
-            const result = await response.json();
-            // 서버가 리디렉션 URL을 응답으로 보낼 경우
-            if (result.redirect_url) {
-                window.location.href = result.redirect_url;  
-            }
-        } else {
-            console.error('Error:', response.statusText);
+            if (response.ok) {
+                const result = await response.json();
+                // 서버가 리디렉션 URL을 응답으로 보낼 경우
+                if (result.redirect_url) {
+                    window.location.href = result.redirect_url;  
+                }
+            } else {
+                console.error('Error:', response.statusText);
         }
     }
         
