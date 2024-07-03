@@ -172,7 +172,6 @@ def wiki():
     try:
         verify_jwt_in_request()
         current_user = get_jwt_identity()
-        
         userNickName = current_user['userNickName']
         return jsonify(logged_in_as=userNickName)
     
@@ -211,6 +210,20 @@ def get_user_data():
     return jsonify(userRealname=userRealname, userNickname=userNickname, userWrittenNum = userWrittenNum)
 
 
+@app.route('/getUserData', methods=['GET'])
+@jwt_required()
+def get_user_data():
+    claims = get_jwt()
+    user_info = claims['sub']
+    user_real_name = user_info.get('userRealName')
+    user_nick_name = user_info.get('userNickName')
+    userRealname = user_info.get('userRealName')
+    print(userRealname)
+    userNickname = user_info.get('userNickName')
+    userWrittenNum = documents.count_documents({'writer': userNickname})
+    return jsonify(userRealname=userRealname, userNickname=userNickname, userWrittenNum = userWrittenNum)
+
+
 @app.route('/save', methods=['POST'])
 @jwt_required()
 def save():
@@ -230,7 +243,6 @@ def save():
         except Exception as e:
             print("Error getting current time:", str(e))
             return jsonify({"error": "Error getting current time"}), 500
-        
 
         # 마이크로초 생략하고 포맷 지정
         formatted_now = now_dt.strftime('%Y-%m-%d %H:%M:%S')
@@ -243,6 +255,7 @@ def save():
         isUpdated = False
         recommended = 0
 
+
         '''
         #### TextList
             - Key
@@ -254,7 +267,8 @@ def save():
             - created_at
             - approved_at
             - updated_at
-            - isUpdated -> bool -> 검토가 필요한지
+            - isUpdated -> bool -> 검토가 필요한지 
+                -> isUpdated가 참이면 approve 가 필요하다.
         '''
 
         document = {
@@ -269,16 +283,16 @@ def save():
             'isUpdated': isUpdated,
             'recommended': recommended
         }
+
+        print(document)
+
         documents.insert_one(document)
 
         '''
         Client받기 : Title, Theme, Content, Writer, isEditable
         생성하기: created at or updated at
         DB받기 : approved_at, isUpdated
-        
         '''
-
-        
         return jsonify({"message": "Data saved successfully!"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 400
