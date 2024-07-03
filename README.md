@@ -13,3 +13,17 @@ def wiki_page(): -> 요기로 합침(완)
 @app.route('/wiki/like', methods=['POST']) => 좋아요 기능. url뒤에 변수를 넣어 ssr을 구현 할 수 있는지 고민.
 
 @app.route('/wiki/w', methods=['GET']) => 도큐먼트에 겹치는 타이틀이 있는지. 근데 라이트 페이즈 보고 고칠 필요가 있다.
+
+@app.route('/wiki/r/<title>', methods=['GET'])
+def view_post(title):
+    post = documents.find_one({'title': title})
+    if not post:
+        return jsonify({"msg": "Post not found"}), 404
+    
+    '''
+    
+    post -> title, content, writer ...
+
+    '''
+
+    return render_template('post.html', post=post)

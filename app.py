@@ -82,6 +82,7 @@ def wiki_page():
     documents_Others_date = list(mongo.db.documents.find({'theme':'Others'}).sort('created_at', -1))
     documents_Others_like = list(mongo.db.documents.find({'theme':'Others'}).sort('recommended', -1))
 
+
     return render_template('wiki.html',
                             documents_ProgrammingLanguage_date=documents_ProgrammingLanguage_date,
                             documents_ProgrammingLanguage_like=documents_ProgrammingLanguage_like,
