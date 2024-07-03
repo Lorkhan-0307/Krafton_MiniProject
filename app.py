@@ -110,15 +110,11 @@ def verification():
         verify_jwt_in_request()
         current_user = get_jwt_identity()
         
-        userId = current_user['userId']
-        return jsonify(logged_in_as=userId)
+        userNickName = current_user['userNickName']
+        return jsonify(logged_in_as=userNickName)
     
     except NoAuthorizationError:
         return redirect(url_for('login_page'))
-    
-@app.route('/getWrittenNum', methods=['POST'])
-def getWrittenNum(userNickname):
-    return documents.count_documents({'writer': userNickname})
 
 @app.route('/getUserData', methods=['GET'])
 @jwt_required()
@@ -140,7 +136,6 @@ def save():
         verify_jwt_in_request()
         data = request.get_json()
         title = data['title']
-        tag = data['tag']
         writer = data['writer']
         content = data['content']
 
