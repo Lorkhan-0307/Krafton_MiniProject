@@ -152,7 +152,7 @@
                     <div class="inline mr-2">
                         <!-- 수정 전 게시물 내용 받아오기 -->
                         <label class="inline fw-bold pr-auto" name="title">수정 전 게시물</label>
-                        <div id="markdown-editor" style="overflow:scroll;">{{ content|safe }}</div>
+                        <div id="markdown-editor" style="overflow:scroll;">{{ original_content|safe }}</div>
                     </div>
                     <div class="inline">
                         <!-- 수정 후 게시물 내용 받아오기 -->
@@ -164,17 +164,17 @@
 
 
             <div class="flex items-center justify-center my-4">
-                <form onsubmit="addLike(event, '{{ post['_id'] }}')"
+                <form onsubmit="addApprove(event, '{{ post['_id'] }}')"
                     class="w-40 py-2 px-4 mr-6 bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90 text-center">
                     <button type="submit" id="approve">
-                        승인{{approve_num}}
+                        승인: {{post['approveCnt']}}
                     </button>
                 </form>
 
-                <form onsubmit="redirectToEdit(event, '{{ post['_id'] }}')"
+                <form onsubmit="addDeny(event, '{{ post['_id'] }}')"
                     class="w-40 py-2 px-4 bg-gray-800 text-white text-lg rounded-lg focus:outline-none hover:opacity-90 text-center">
                     <button type="submit" id="deny">
-                        비승인{{deny_num}}
+                        비승인: {{post['denyCnt']}}
                     </button>
                 </form>
             </div>
@@ -238,11 +238,9 @@
             window.location.href = `/wiki/e/${postId}`;
         }
 
-        function addLike(event, postId) {
+        function addApprove(event, postId) {
 
             event.preventDefault();  // 기본 동작 막기
-
-
 
             const accessToken = sessionStorage.getItem('access_token');
             if (!accessToken) {
@@ -251,7 +249,7 @@
             }
 
             $.ajax({
-                url: '/wiki/like',
+                url: '/wiki/approve',
                 type: 'POST',
                 contentType: 'application/json',
                 headers: {
@@ -260,8 +258,8 @@
                 data: JSON.stringify({ id_give: postId }),
                 success: function (response) {
                     if (response.result === 'success') {
-                        alert('Like added successfully!');
-                        location.reload();
+                        alert('Approve added successfully!');
+                        window.location.href = '/wiki';
                     } else {
                         alert('Failed to add like.');
                     }
@@ -271,6 +269,37 @@
                 }
             });
         }
+
+        function addDeny(event, postId) {
+
+            event.preventDefault();  // 기본 동작 막기
+
+            const accessToken = sessionStorage.getItem('access_token');
+            if (!accessToken) {
+                alert('Access token is missing!');
+                return;
+            }
+
+            $.ajax({
+                url: '/wiki/deny',
+                type: 'POST',
+                contentType: 'application/json',
+                headers: {
+                    'Authorization': 'Bearer ' + accessToken
+                },
+                data: JSON.stringify({ id_give: postId }),
+                success: function (response) {
+                    if (response.result === 'success') {
+                        window.location.href = '/wiki';
+                    } else {
+                        alert('Failed to add like.');
+                    }
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+            }
 
 
         async function submitForm(event) {

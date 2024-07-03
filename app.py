@@ -306,7 +306,9 @@ def edit_save():
             'approved_at': approved_at,
             'updated_at': updated_at,
             'isUpdated': isUpdated,
-            'recommended': recommended
+            'recommended': recommended,
+            'approveCnt' : 0,
+            'denyCnt' : 0
         }
 
 
@@ -358,14 +360,20 @@ def edit_page(id):
 
 @app.route('/wiki/re/<id>', methods=['GET'])
 def readedit_page(id):
-    post = documents.find_one({'_id': ObjectId(id)})
+    post = edited_documents.find_one({'_id': ObjectId(id)})
+    if(documents.find_one({'_id': ObjectId(post['original_post_id'])}) == None):
+        redirect(url_for('wiki_page'))
+    original_post = documents.find_one({'_id': ObjectId(post['original_post_id'])})
+    if(original_post == None):
+        redirect(url_for('wiki_page'))
+    original_content = markdown.markdown(original_post['content'])
     content = markdown.markdown(post['content'])
     created_at = post['created_at']
     recommended = post['recommended']
     theme = post['theme']
     cnt = documents.count_documents({})
 
-    return render_template('readedit.html', themesList=themesList, post=post, content=content,
+    return render_template('edit_read.html', original_content=original_content, themesList=themesList, post=post, content=content,
                            create_at=created_at, recommended=recommended, theme=theme, cnt=cnt)
 
 @app.route('/wiki/like', methods=['POST'])
@@ -385,6 +393,87 @@ def like_article():
     mongo.db.documents.update_one({'_id': article_id}, {'$set': {'recommended': new_like}})
 
     return jsonify({'result': 'success', 'msg': 'success'})
+
+@app.route('/wiki/approve', methods=['POST'])
+@jwt_required()
+def add_approve():
+    verify_jwt_in_request()
+    #클라이언트로부터 _id 받기.
+    data = request.get_json()  # request.form 대신 request.get_json() 사용
+    article_id = ObjectId(data['id_give'])  # JSON 데이터에서 id_give 추출
+
+    article = edited_documents.find_one({'_id':article_id})
+
+    new_approve = article['approveCnt'] + 1
+    if(new_approve >= 5):
+        # 원본으로 교체
+        original_post_id = article['original_post_id']
+        if isinstance(original_post_id, str):
+            original_post_id = ObjectId(original_post_id)
+
+
+        original_article = documents.find_one({'_id': original_post_id})
+        now_dt = dt.now()
+        formatted_now = now_dt.strftime('%Y-%m-%d %H:%M:%S')
+
+        approved_at = formatted_now
+        document = {
+            'title': article['title'],
+            'writer': original_article['writer'],
+            'content': article['content'],
+            'isEditable':  article['isEditable'],
+            'theme': article['theme'],
+            'created_at': article['created_at'],
+            'approved_at': approved_at,
+            'updated_at': article['updated_at'],
+            'isUpdated': False,
+            'recommended': article['recommended']
+        }
+        documents.update_one(
+            {'_id':original_post_id},
+            {'$set': document}
+        )
+        edited_documents.delete_one({'_id': ObjectId(article_id)})
+
+    else:
+        edited_documents.update_one({'_id': article_id}, {'$set': {'approveCnt': new_approve}})
+
+    return jsonify({'result': 'success', 'msg': 'success'})
+
+@app.route('/wiki/deny', methods=['POST'])
+@jwt_required()
+def add_deny():
+    verify_jwt_in_request()
+    #클라이언트로부터 _id 받기.
+    data = request.get_json()  # request.form 대신 request.get_json() 사용
+    article_id = ObjectId(data['id_give'])  # JSON 데이터에서 id_give 추출
+    #클라이언트로부터 _id 받기.
+    data = request.get_json()  # request.form 대신 request.get_json() 사용
+    article_id = ObjectId(data['id_give'])  # JSON 데이터에서 id_give 추출
+
+    article = edited_documents.find_one({'_id':article_id})
+
+    new_deny = article['denyCnt'] + 1
+    if(new_deny >= 5):
+        # 삭제
+        original_post_id = article['original_post_id']
+        if isinstance(original_post_id, str):
+            original_post_id = ObjectId(original_post_id)
+
+
+        original_article = documents.find_one({'_id': original_post_id})
+
+        documents.update_one(
+            {'_id': ObjectId(article['original_post_id'])},
+            {'$set': {'isUpdated': False}}
+        )
+        edited_documents.delete_one({'_id': ObjectId(article_id)})
+
+    else:
+        edited_documents.update_one({'_id': article_id}, {'$set': {'denyCnt': new_deny}})
+
+    return jsonify({'result': 'success', 'msg': 'success'})
+
 
 #랜덤 게시물은 나중에 추가.
 # @app.route('/wiki/random', methods=['GET'])
