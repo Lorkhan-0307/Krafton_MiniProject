@@ -72,7 +72,7 @@
                     <li>
                         <a href="#"
                             class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 group">
-                            <span class="flex-1 ms-3 whitespace-nowrap">{{}}</span> : 테마
+                            <span class="flex-1 ms-3 whitespace-nowrap">{{ theme }}</span> : 테마
                         </a>
                     </li>
                     {% endfor %} -->
@@ -96,10 +96,10 @@
                         오른쪽 프로필 네비게이션 부분
 
                         <label class="block">
-                            <span class="ms-3">이름 : {{}}</span> : 현재 로그인 된 계정의 본명
+                            <span class="ms-3">이름 : {{ userRealname }}</span> : 현재 로그인 된 계정의 본명
                         </label>
                         <label class="block">
-                            <span class="ms-3">작성글 수 : {{}}</span> : 현재 로그인 된 계정의 작성글 수
+                            <span class="ms-3">작성글 수 : {{ userWrittenNum }}</span> : 현재 로그인 된 계정의 작성글 수
                         </label> -->
                     </div>
                 </div>
@@ -124,10 +124,10 @@
                     <tr>
                         <th scope="row" colspan="3">
                             onclick 구현
-                            <span onclick="" class="hover:text-blue-400 hover:cursor-pointer">{{title}}</span> : 최신순 제목
+                            <span onclick="" class="hover:text-blue-400 hover:cursor-pointer">{{ title }}</span> : 최신순 제목
                         </th>
-                        <td>{{}}</td> : 작성자
-                        <td>{{}}</td> : 수정 시간
+                        <td>{{ writer }}</td> : 작성자
+                        <td>{{ lastModifiedTime }}</td> : 수정 시간
                     </tr>
                     {% endfor %} -->
                 </tbody>
@@ -151,8 +151,8 @@
                     {% for ml in myList %}
                     <tr class="hover:bg-gray-300">
                         <th scope="row" colspan="3">{{title}}</th> : 인기순 제목
-                        <td>{{}}</td> : 작성자
-                        <td>{{}}</td> : 수정 시간
+                        <td>{{ writer }}</td> : 작성자
+                        <td>{{ lastModifiedTime }}</td> : 수정 시간
                     </tr>
                     {% endfor %} -->
                 </tbody>
